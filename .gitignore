@@ -117,3 +117,19 @@ pip-selfcheck.json
 
 # End of https://www.gitignore.io/api/python,virtualenv
 
+
+# Created by https://www.gitignore.io/api/visualstudiocode
+
+### VisualStudioCode ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history
+
+
+# End of https://www.gitignore.io/api/visualstudiocode
+
+# Do not commit databases
+*.db
