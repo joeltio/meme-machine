@@ -135,4 +135,4 @@ pip-selfcheck.json
 *.db
 
 # Do not commit the settings because its a secret!
-settings.py
+meme_machine/settings.py
