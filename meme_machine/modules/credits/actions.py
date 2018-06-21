@@ -4,6 +4,7 @@ from database import create_engine
 from modules.base.helpers import limit_command_arg
 from modules.base.models import get_or_create_user
 from modules.credits.models import get_or_create_credit
+from modules.credits.settings import *
 
 
 @limit_command_arg(2)
@@ -11,22 +12,17 @@ async def donate(client, message, receiver_tag, str_amount):
     # Validate incoming arguments
     try:
         if not str_amount.isdigit():
-            error_message = ("Invalid argument type: amount given should be "
-                             "an integer.")
-            raise Exception(error_message)
+            raise Exception(DONATE_ERROR_INVALID_AMOUNT_TYPE)
+        elif int(str_amount) <= 0:
+            raise Exception(DONATE_ERROR_AMOUNT_NOT_POSITIVE)
         elif message.author.mention == receiver_tag:
-            error_message = "Error: Cannot donate PP to yourself."
-            raise Exception(error_message)
+            raise Exception(DONATE_ERROR_SELF_DONATE)
         elif len(message.mentions) < 1:
-            error_message = "Error: No users were mentioned to receive the PP."
-            raise Exception(error_message)
+            raise Exception(DONATE_ERROR_NO_USER_MENTIONED)
         elif len(message.mentions) > 1:
-            error_message = ("Error: Too many users were mentioned to receive "
-                             "the PP.")
-            raise Exception(error_message)
+            raise Exception(DONATE_ERROR_TOO_MANY_USERS_MENTIONED)
         elif message.mentions[0].bot:
-            error_message = "Error: A bot cannot receive PP."
-            raise Exception(error_message)
+            raise Exception(DONATE_ERROR_BOT_MENTIONED)
     except Exception as e:
         await client.send_message(message.channel, e)
         return
@@ -51,8 +47,8 @@ async def donate(client, message, receiver_tag, str_amount):
 
     # 3. Check if there is enough credits in the sending user
     if sender_credit.credits < amount:
-        error_message = "Error: You do not have enough credits."
-        await client.send_message(message.channel, error_message)
+        await client.send_message(
+            message.channel, DONATE_ERROR_INSUFFICIENT_CREDITS)
 
         session.commit()
         session.close()
@@ -66,5 +62,6 @@ async def donate(client, message, receiver_tag, str_amount):
     session.commit()
     session.close()
 
-    await client.send_message(message.channel,
-                              f"Donated {amount}PP to {receiver_tag}")
+    success_message = DONATE_SUCCESS.format(
+        amount=amount, receiver=receiver_tag)
+    await client.send_message(message.channel, success_message)
