@@ -133,3 +133,6 @@ pip-selfcheck.json
 
 # Do not commit databases
 *.db
+
+# Do not commit the settings because its a secret!
+settings.py
