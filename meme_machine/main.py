@@ -1,7 +1,7 @@
 import discord
 
 from settings import BOT_TOKEN, PREFIX
-from commands import COMMANDS
+from commands import COMMANDS, COMMAND_AUTH
 
 client = discord.Client()
 
@@ -22,6 +22,13 @@ async def on_message(message):
         # Separate the command from it's arguments
         command = full_command[0]
         arguments = full_command[1:]
-        await COMMANDS[command](client, message, *arguments)
+
+        # Ensure that the user is authorized to execute the command
+        is_authorized = COMMAND_AUTH[command](message.author, command)
+        if is_authorized:
+            await COMMANDS[command](client, message, *arguments)
+        else:
+            await client.send_message(
+                message.channel, "You are not allowed to use that command")
 
 client.run(BOT_TOKEN)
