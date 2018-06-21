@@ -16,6 +16,10 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+    # Ignore all bot users
+    if message.author.bot:
+        return
+
     if message.content.startswith(PREFIX):
         # Remove the prefix from the full command
         full_command = message.content[len(PREFIX):].split()
