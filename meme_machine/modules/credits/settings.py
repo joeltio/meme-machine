@@ -3,8 +3,6 @@ STARTING_CREDITS = 0
 # Donate command constants
 DONATE_ERROR_INVALID_AMOUNT_TYPE = ("Invalid argument type: amount given "
                                     "should be a positive integer.")
-DONATE_ERROR_AMOUNT_NOT_POSITIVE = ("Error: The amount given should be "
-                                    "positive.")
 DONATE_ERROR_SELF_DONATE = "Error: Cannot donate PP to yourself."
 DONATE_ERROR_NO_USER_MENTIONED = ("Error: No users were mentioned to receive "
                                   "the PP.")
@@ -19,7 +17,7 @@ DONATE_SUCCESS = "You have donated {amount}PP to {receiver}!"
 
 # Admin add command constants
 ADMIN_ADD_ERROR_INVALID_AMOUNT_TYPE = ("Invalid argument type: amount given "
-                                       "should be an integer.")
+                                       "should be a positive integer.")
 ADMIN_ADD_ERROR_NO_USER_MENTIONED = ("Error: No users were mentioned to "
                                      "receive the PP.")
 ADMIN_ADD_ERROR_TOO_MANY_USERS_MENTIONED = ("Error: Too many users were "

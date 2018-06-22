@@ -11,10 +11,9 @@ from modules.credits.settings import *
 async def donate(client, message, receiver_tag, str_amount):
     # Validate incoming arguments
     try:
+        # isdigit() considers negative strings, i.e. "-100" as False
         if not str_amount.isdigit():
             raise Exception(DONATE_ERROR_INVALID_AMOUNT_TYPE)
-        elif int(str_amount) <= 0:
-            raise Exception(DONATE_ERROR_AMOUNT_NOT_POSITIVE)
         elif message.author.mention == receiver_tag:
             raise Exception(DONATE_ERROR_SELF_DONATE)
         elif len(message.mentions) < 1:
@@ -71,6 +70,7 @@ async def donate(client, message, receiver_tag, str_amount):
 async def admin_add(client, message, receiver_tag, str_amount):
     # Validate incoming arguments
     try:
+        # isdigit() considers negative strings, i.e. "-100" as False
         if not str_amount.isdigit():
             raise Exception(ADMIN_ADD_ERROR_INVALID_AMOUNT_TYPE)
         elif len(message.mentions) < 1:
