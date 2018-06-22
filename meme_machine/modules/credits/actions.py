@@ -65,3 +65,40 @@ async def donate(client, message, receiver_tag, str_amount):
     success_message = DONATE_SUCCESS.format(
         amount=amount, receiver=receiver_tag)
     await client.send_message(message.channel, success_message)
+
+
+@limit_command_arg(2)
+async def admin_add(client, message, receiver_tag, str_amount):
+    # Validate incoming arguments
+    try:
+        if not str_amount.isdigit():
+            raise Exception(ADMIN_ADD_ERROR_INVALID_AMOUNT_TYPE)
+        elif len(message.mentions) < 1:
+            raise Exception(ADMIN_ADD_ERROR_NO_USER_MENTIONED)
+        elif len(message.mentions) > 1:
+            raise Exception(ADMIN_ADD_ERROR_TOO_MANY_USERS_MENTIONED)
+        elif message.mentions[0].bot:
+            raise Exception(ADMIN_ADD_ERROR_BOT_MENTIONED)
+    except Exception as e:
+        await client.send_message(message.channel, e)
+        return
+
+    amount = int(str_amount)
+    receiver_discord = message.mentions[0]
+
+    # Start a session
+    engine = create_engine()
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    receiver_user = get_or_create_user(session, receiver_discord)
+    receiver_credit = get_or_create_credit(session, receiver_user.id)
+    receiver_credit.credits += amount
+
+    session.commit()
+    session.close()
+
+    success_message = ADMIN_ADD_SUCCESS.format(
+        amount=amount, receiver=receiver_tag)
+
+    await client.send_message(message.channel, success_message)
