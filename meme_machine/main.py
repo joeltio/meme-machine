@@ -1,7 +1,7 @@
 import discord
 
 from settings import (BOT_TOKEN, PREFIX, ERROR_NOT_AUTHORISED,
-                      ERROR_BAD_PERMISSIONS)
+                      ERROR_BAD_PERMISSIONS, ERROR_NO_SUCH_COMMAND)
 from commands import COMMANDS
 from auth import ADMIN_PERMISSIONS, USER_ALLOWED_COMMANDS
 
@@ -28,6 +28,11 @@ async def on_message(message):
         # Separate the command from it's arguments
         command = full_command[0]
         arguments = full_command[1:]
+
+        # Ensure that the command exists
+        if command not in COMMANDS:
+            await client.send_message(message.channel, ERROR_NO_SUCH_COMMAND)
+            return
 
         # Ensure that the user is authorized to execute the command
         # The command is a command allowed to all users
