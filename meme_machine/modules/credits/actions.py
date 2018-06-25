@@ -1,29 +1,29 @@
-from sqlalchemy.orm import sessionmaker
-
-from database import create_engine
-from modules.base.helpers import limit_command_arg
+from database import create_session
+from modules.base.helpers import (limit_command_arg, validate_num_of_mentions,
+                                  first)
 from modules.base.models import get_or_create_user
 from modules.credits.models import get_or_create_credit
 from modules.credits.settings import *
+from modules.credits.helpers import validate_credit_arg
 
 
 @limit_command_arg(2)
 async def donate(client, message, receiver_tag, str_amount):
     # Validate incoming arguments
-    try:
-        # isdigit() considers negative strings, i.e. "-100" as False
-        if not str_amount.isdigit():
-            raise Exception(DONATE_ERROR_INVALID_AMOUNT_TYPE)
-        elif message.author.mention == receiver_tag:
-            raise Exception(DONATE_ERROR_SELF_DONATE)
-        elif len(message.mentions) < 1:
-            raise Exception(DONATE_ERROR_NO_USER_MENTIONED)
-        elif len(message.mentions) > 1:
-            raise Exception(DONATE_ERROR_TOO_MANY_USERS_MENTIONED)
-        elif message.mentions[0].bot:
-            raise Exception(DONATE_ERROR_BOT_MENTIONED)
-    except Exception as e:
-        await client.send_message(message.channel, e)
+    validations = [
+        validate_credit_arg(str_amount),
+        validate_num_of_mentions(message.mentions, 1),
+    ]
+    error = first(lambda x: x is not None, validations)
+
+    if error is None:
+        # Check for self donation
+        if message.author.mention == receiver_tag:
+            await client.send_message(message.channel,
+                                      DONATE_ERROR_SELF_DONATE)
+            return
+    else:
+        await client.send_message(message.channel, error)
         return
 
     amount = int(str_amount)
@@ -32,9 +32,7 @@ async def donate(client, message, receiver_tag, str_amount):
     receiver_discord = message.mentions[0]
 
     # Start a session
-    engine = create_engine()
-    Session = sessionmaker(bind=engine)
-    session = Session()
+    session = create_session()
 
     # 1. Create both users if they do not already exist
     sender_user = get_or_create_user(session, sender_discord)
@@ -68,37 +66,68 @@ async def donate(client, message, receiver_tag, str_amount):
 
 @limit_command_arg(2)
 async def admin_add(client, message, receiver_tag, str_amount):
-    # Validate incoming arguments
-    try:
-        # isdigit() considers negative strings, i.e. "-100" as False
-        if not str_amount.isdigit():
-            raise Exception(ADMIN_ADD_ERROR_INVALID_AMOUNT_TYPE)
-        elif len(message.mentions) < 1:
-            raise Exception(ADMIN_ADD_ERROR_NO_USER_MENTIONED)
-        elif len(message.mentions) > 1:
-            raise Exception(ADMIN_ADD_ERROR_TOO_MANY_USERS_MENTIONED)
-        elif message.mentions[0].bot:
-            raise Exception(ADMIN_ADD_ERROR_BOT_MENTIONED)
-    except Exception as e:
-        await client.send_message(message.channel, e)
+    validations = [
+        validate_credit_arg(str_amount),
+        validate_num_of_mentions(message.mentions, 1),
+    ]
+    error = first(lambda x: x is not None, validations)
+
+    if error is not None:
+        await client.send_message(message.channel, error)
         return
 
     amount = int(str_amount)
     receiver_discord = message.mentions[0]
 
     # Start a session
-    engine = create_engine()
-    Session = sessionmaker(bind=engine)
-    session = Session()
+    session = create_session()
 
     receiver_user = get_or_create_user(session, receiver_discord)
     receiver_credit = get_or_create_credit(session, receiver_user.id)
+
+    # Increase the credit amount
     receiver_credit.credits += amount
 
     session.commit()
     session.close()
 
     success_message = ADMIN_ADD_SUCCESS.format(
-        amount=amount, receiver=receiver_tag)
+        amount=str_amount, receiver=receiver_tag)
+
+    await client.send_message(message.channel, success_message)
+
+
+@limit_command_arg(2)
+async def admin_remove(client, message, receiver_tag, str_amount):
+    validations = [
+        validate_credit_arg(str_amount),
+        validate_num_of_mentions(message.mentions, 1),
+    ]
+    error = first(lambda x: x is not None, validations)
+
+    if error is not None:
+        await client.send_message(message.channel, error)
+        return
+
+    amount = int(str_amount)
+    receiver_discord = message.mentions[0]
+
+    # Start a session
+    session = create_session()
+
+    receiver_user = get_or_create_user(session, receiver_discord)
+    receiver_credit = get_or_create_credit(session, receiver_user.id)
+
+    # Find out how much should be deducted
+    deduction = min(receiver_credit.credits, amount)
+
+    # Deduct receiver's credit
+    receiver_credit.credits -= deduction
+
+    session.commit()
+    session.close()
+
+    success_message = ADMIN_REMOVE_SUCCESS.format(
+        amount=deduction, receiver=receiver_tag)
 
     await client.send_message(message.channel, success_message)
