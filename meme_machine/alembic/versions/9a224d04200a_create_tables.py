@@ -44,11 +44,11 @@ def upgrade():
         "credit_action",
         sa.Column("user_id", sa.Integer, sa.ForeignKey("user.id"),
                   primary_key=True),
-        # The timestamp stored is the last active timestamp + random cooldown
-        # So, after the timestamp, the user will be rewarded for being active
-        sa.Column("next_active", sa.TIMESTAMP, nullable=False),
+        # The datetime stored is the last active datetime + random cooldown
+        # So, after the datetime, the user will be rewarded for being active
+        sa.Column("next_active", sa.DateTime, nullable=False),
         # The same as above, but for dailies
-        sa.Column("next_daily", sa.TIMESTAMP, nullable=False),
+        sa.Column("next_daily", sa.DateTime, nullable=False),
     )
 
     # Auth table
