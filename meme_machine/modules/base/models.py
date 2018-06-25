@@ -16,6 +16,12 @@ class User(Base):
     __tableargs__ = (UniqueConstraint("username", "discriminator"),)
 
 
+class Config(Base):
+    __tablename__ = "config"
+    name = Column(String, primary_key=True)
+    value = Column(String, nullable=False)
+
+
 def user_exists(session, discord_snowflake):
     """Checks if a user exists in the user table based on the discord
     snowflake
