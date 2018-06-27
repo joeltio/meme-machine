@@ -4,6 +4,7 @@ from settings import (BOT_TOKEN, PREFIX, ERROR_NOT_AUTHORISED,
                       ERROR_BAD_PERMISSIONS, ERROR_NO_SUCH_COMMAND)
 from commands import COMMANDS
 from auth import ADMIN_PERMISSIONS, USER_ALLOWED_COMMANDS
+from hooks import HOOK_USER_MESSAGE_SENT
 
 client = discord.Client()
 
@@ -21,6 +22,10 @@ async def on_message(message):
     # Ignore all bot users
     if message.author.bot:
         return
+
+    # HOOK: User message
+    for hook_fn in HOOK_USER_MESSAGE_SENT:
+        await hook_fn(client, message)
 
     if message.content.startswith(PREFIX):
         # Remove the prefix from the full command
