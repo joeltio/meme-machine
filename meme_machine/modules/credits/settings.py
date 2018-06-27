@@ -21,8 +21,8 @@ ADMIN_REMOVE_SUCCESS = "You have removed {amount}PP from {receiver}"
 
 DAILY_CONFIG_MAX_NAME = "daily_max"
 DAILY_CONFIG_MIN_NAME = "daily_min"
-DAILY_CONFIG_MIN_DEFAULT = 1
-DAILY_CONFIG_MAX_DEFAULT = 5
+DAILY_CONFIG_MIN_DEFAULT = 5
+DAILY_CONFIG_MAX_DEFAULT = 15
 DAILY_SECONDS_LEFT = "You have to wait {seconds} more seconds"
 DAILY_MINUTES_LEFT = "You have to wait {minutes} more minutes"
 DAILY_HOURS_AND_MINUTES_LEFT = ("You have to wait {hours} hours and {minutes} "
