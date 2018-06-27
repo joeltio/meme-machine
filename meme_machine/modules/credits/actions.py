@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 from database import create_session
-from modules.base.helpers import (limit_command_arg, validate_num_of_mentions,
-                                  first)
+from modules.base.helpers import limit_command_arg, validate_num_of_mentions
 import random
 
 from modules.base.models import get_or_create_user
@@ -9,17 +8,14 @@ from modules.credits.models import (get_or_create_credit,
                                     get_or_create_credit_action,
                                     get_or_create_daily_range)
 from modules.credits.settings import *
-from modules.credits.helpers import validate_credit_arg
+from modules.credits.helpers import validate_credit_arg, validate_credit_range
 
 
 @limit_command_arg(2)
 async def donate(client, message, receiver_tag, str_amount):
     # Validate incoming arguments
-    validations = [
-        validate_credit_arg(str_amount),
-        validate_num_of_mentions(message.mentions, 1),
-    ]
-    error = first(lambda x: x is not None, validations)
+    error = (validate_credit_arg(str_amount) or
+             validate_num_of_mentions(message.mentions, 1))
 
     if error is None:
         # Check for self donation
@@ -71,11 +67,8 @@ async def donate(client, message, receiver_tag, str_amount):
 
 @limit_command_arg(2)
 async def admin_add(client, message, receiver_tag, str_amount):
-    validations = [
-        validate_credit_arg(str_amount),
-        validate_num_of_mentions(message.mentions, 1),
-    ]
-    error = first(lambda x: x is not None, validations)
+    error = (validate_credit_arg(str_amount) or
+             validate_num_of_mentions(message.mentions, 1))
 
     if error is not None:
         await client.send_message(message.channel, error)
@@ -104,11 +97,8 @@ async def admin_add(client, message, receiver_tag, str_amount):
 
 @limit_command_arg(2)
 async def admin_remove(client, message, receiver_tag, str_amount):
-    validations = [
-        validate_credit_arg(str_amount),
-        validate_num_of_mentions(message.mentions, 1),
-    ]
-    error = first(lambda x: x is not None, validations)
+    error = (validate_credit_arg(str_amount) or
+             validate_num_of_mentions(message.mentions, 1))
 
     if error is not None:
         await client.send_message(message.channel, error)
@@ -173,7 +163,9 @@ async def daily(client, message):
                 hours=hours, minutes=minutes)
     else:
         # Get daily max and min
-        daily_min, daily_max = get_or_create_daily_range(session)
+        daily_min_config, daily_max_config = get_or_create_daily_range(session)
+        daily_min = int(daily_min_config)
+        daily_max = int(daily_max_config)
 
         # Give the daily
         amount = random.randint(daily_min, daily_max)
@@ -190,3 +182,29 @@ async def daily(client, message):
     session.close()
 
     await client.send_message(message.channel, result_message)
+
+
+@limit_command_arg(2)
+async def admin_daily_amt(client, message, str_new_min, str_new_max):
+    # Validate arguments
+    error = (validate_credit_arg(str_new_min) or
+             validate_credit_arg(str_new_max) or
+             validate_credit_range(int(str_new_min), int(str_new_max)))
+
+    if error is not None:
+        await client.send_message(message.channel, error)
+        return
+
+    session = create_session()
+
+    daily_min_config, daily_max_config = get_or_create_daily_range(session)
+    daily_min_config.value = str_new_min
+    daily_max_config.value = str_new_max
+
+    session.commit()
+    session.close()
+
+    success_message = ADMIN_DAILY_AMT_SUCCESS.format(
+        start=str_new_min, end=str_new_max)
+
+    await client.send_message(message.channel, success_message)

@@ -183,10 +183,8 @@ def get_or_create_daily_range(session):
         )
 
         session.add(min_config)
-
-        min_value = DAILY_CONFIG_MIN_DEFAULT
     else:
-        min_value = min_query[0].value
+        min_config = min_query[0]
 
     max_query = session.query(Config).filter_by(
         name=DAILY_CONFIG_MAX_NAME).all()
@@ -198,11 +196,9 @@ def get_or_create_daily_range(session):
         )
 
         session.add(max_config)
-
-        max_value = DAILY_CONFIG_MAX_DEFAULT
     else:
-        max_value = max_query[0].value
+        max_config = max_query[0]
 
     session.commit()
 
-    return (int(min_value), int(max_value))
+    return (min_config, max_config)

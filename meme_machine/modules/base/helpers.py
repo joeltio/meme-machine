@@ -22,18 +22,6 @@ def limit_command_arg(num_args):
     return decorator
 
 
-def first(predicate, l):
-    """Returns the value that fulfils the predicate function
-
-    :param predicate: The predicate to fulfil
-    :type predicate: function val -> bool.
-    """
-    for item in l:
-        if predicate(item):
-            return item
-    return None
-
-
 def validate_num_of_mentions(mentions, num, user_only=True):
     """Validates that the number of mentions in `mentions` is `num`.
 

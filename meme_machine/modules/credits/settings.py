@@ -3,7 +3,9 @@ STARTING_CREDITS = 0
 # Credit argument validation constants
 CREDIT_ERROR_INVALID_AMOUNT_TYPE = ("Invalid argument type: amount given "
                                     "should be a positive integer.")
-
+# Error for when the range given is incorrect
+CREDIT_ERROR_REVERSED_RANGE = ("Error: The upper limit should be larger than "
+                               "the lower limit")
 
 # Donate command constants
 DONATE_ERROR_SELF_DONATE = "Error: Cannot donate PP to yourself."
@@ -26,3 +28,6 @@ DAILY_MINUTES_LEFT = "You have to wait {minutes} more minutes"
 DAILY_HOURS_AND_MINUTES_LEFT = ("You have to wait {hours} hours and {minutes} "
                                 "more minutes")
 DAILY_SUCCESS = "You have gotten {amount}PP!"
+
+ADMIN_DAILY_AMT_SUCCESS = ("Successfully updated daily range to "
+                           "{start}PP-{end}PP")
