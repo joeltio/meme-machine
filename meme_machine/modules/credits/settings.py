@@ -30,7 +30,7 @@ DAILY_SECONDS_LEFT = "You have to wait {seconds} more seconds"
 DAILY_MINUTES_LEFT = "You have to wait {minutes} more minutes"
 DAILY_HOURS_AND_MINUTES_LEFT = ("You have to wait {hours} hours and {minutes} "
                                 "more minutes")
-DAILY_SUCCESS = "You have gotten {amount}PP!"
+DAILY_SUCCESS = "{mention} has just gotten {amount}PP!"
 
 ADMIN_DAILY_AMT_SUCCESS = ("Successfully updated daily range to "
                            "{start}PP-{end}PP")
@@ -46,4 +46,4 @@ HOOK_USER_ACTIVITY_CONFIG_MAX_AMT_DEFAULT = 5
 HOOK_USER_ACTIVITY_CONFIG_MIN_TIME_DEFAULT = 1
 HOOK_USER_ACTIVITY_CONFIG_MAX_TIME_DEFAULT = 5
 
-HOOK_USER_ACTIVITY_SUCCESS = "You have just gotten {amount}PP!"
+HOOK_USER_ACTIVITY_SUCCESS = "{mention} has just gotten {amount}PP!"

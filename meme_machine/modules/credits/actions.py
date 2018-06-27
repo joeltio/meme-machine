@@ -169,8 +169,8 @@ async def daily(client, message):
         # Get daily max and min
         daily_min_config, daily_max_config = \
             credit_models.get_or_create_daily_range(session)
-        daily_min = int(daily_min_config)
-        daily_max = int(daily_max_config)
+        daily_min = int(daily_min_config.value)
+        daily_max = int(daily_max_config.value)
 
         # Give the daily
         amount = random.randint(daily_min, daily_max)
@@ -182,7 +182,8 @@ async def daily(client, message):
         # Update next_daily
         sender_credit_action.next_daily = datetime.now() + timedelta(days=1)
 
-        result_message = credit_settings.DAILY_SUCCESS.format(amount=amount)
+        result_message = credit_settings.DAILY_SUCCESS.format(
+            amount=amount, mention=sender_discord.mention)
 
     session.commit()
     session.close()
@@ -259,5 +260,5 @@ async def hook_user_activity(client, message):
     session.commit()
 
     success_message = credit_settings.HOOK_USER_ACTIVITY_SUCCESS.format(
-        amount=amount)
+        amount=amount, mention=discord_user.mention)
     await client.send_message(message.channel, success_message)

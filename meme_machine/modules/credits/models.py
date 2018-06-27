@@ -226,12 +226,12 @@ def get_or_create_randpp_amt_range(session):
     activeness values that can be awarded
     """
     min_config = get_or_create_config(
-        session, credit_settings.HOOK_USER_ACTIVITY_CONFIG_MAX_AMT_NAME,
-        credit_settings.HOOK_USER_ACTIVITY_CONFIG_MIN_AMT_DEFAULT)
+        session, credit_settings.HOOK_USER_ACTIVITY_CONFIG_MIN_AMT_NAME,
+        str(credit_settings.HOOK_USER_ACTIVITY_CONFIG_MIN_AMT_DEFAULT))
 
     max_config = get_or_create_config(
         session, credit_settings.HOOK_USER_ACTIVITY_CONFIG_MAX_AMT_NAME,
-        credit_settings.HOOK_USER_ACTIVITY_CONFIG_MAX_AMT_DEFAULT)
+        str(credit_settings.HOOK_USER_ACTIVITY_CONFIG_MAX_AMT_DEFAULT))
 
     session.commit()
 
@@ -252,12 +252,12 @@ def get_or_create_randpp_time_range(session):
     activeness times that can be awarded
     """
     min_config = get_or_create_config(
-        session, credit_settings.HOOK_USER_ACTIVITY_CONFIG_MAX_TIME_NAME,
-        credit_settings.HOOK_USER_ACTIVITY_CONFIG_MIN_TIME_DEFAULT)
+        session, credit_settings.HOOK_USER_ACTIVITY_CONFIG_MIN_TIME_NAME,
+        str(credit_settings.HOOK_USER_ACTIVITY_CONFIG_MIN_TIME_DEFAULT))
 
     max_config = get_or_create_config(
         session, credit_settings.HOOK_USER_ACTIVITY_CONFIG_MAX_TIME_NAME,
-        credit_settings.HOOK_USER_ACTIVITY_CONFIG_MAX_TIME_DEFAULT)
+        str(credit_settings.HOOK_USER_ACTIVITY_CONFIG_MAX_TIME_DEFAULT))
 
     session.commit()
 
