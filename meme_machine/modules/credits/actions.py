@@ -6,9 +6,9 @@ import database as main_db
 import modules.base.helpers as base_helpers
 import modules.base.models as base_models
 
-import modules.credit.models as credit_models
+import modules.credits.models as credit_models
 import modules.credits.settings as credit_settings
-import modules.credit.helpers as credit_helpers
+import modules.credits.helpers as credit_helpers
 
 
 @base_helpers.limit_command_arg(2)
@@ -215,4 +215,49 @@ async def admin_daily_amt(client, message, str_new_min, str_new_max):
     success_message = credit_settings.ADMIN_DAILY_AMT_SUCCESS.format(
         start=str_new_min, end=str_new_max)
 
+    await client.send_message(message.channel, success_message)
+
+
+async def hook_user_activity(client, message):
+    session = main_db.create_session()
+
+    discord_user = message.author
+    user = base_models.get_or_create_user(session, discord_user)
+
+    # Get the next reward time
+    credit_action = credit_models.get_or_create_credit_action(
+        session, user.id)
+
+    time_left = credit_action.next_active - datetime.now()
+
+    # Stop if it is not time yet
+    if time_left.total_seconds() >= 0:
+        return
+
+    # Get reward amount
+    reward_min_config, reward_max_config = \
+        credit_models.get_or_create_randpp_amt_range(session)
+
+    amount = random.randint(int(reward_min_config.value),
+                            int(reward_max_config.value))
+
+    # Get next reward time
+    time_min_config, time_max_config = \
+        credit_models.get_or_create_randpp_time_range(session)
+
+    time_interval = random.randint(int(time_min_config.value),
+                                   int(time_max_config.value))
+
+    # Give the reward amount
+    user_credit = credit_models.get_or_create_credit(session, user.id)
+    user_credit.credits += amount
+
+    # Set the next reward time
+    credit_action.next_active = \
+        datetime.now() + timedelta(minutes=time_interval)
+
+    session.commit()
+
+    success_message = credit_settings.HOOK_USER_ACTIVITY_SUCCESS.format(
+        amount=amount)
     await client.send_message(message.channel, success_message)

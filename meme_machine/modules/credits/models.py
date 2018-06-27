@@ -4,10 +4,7 @@ from sqlalchemy import Column, Integer, TIMESTAMP, ForeignKey, CheckConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from modules.base.models import User, Config
 
-from modules.credits.settings import (STARTING_CREDITS, DAILY_CONFIG_MIN_NAME,
-                                      DAILY_CONFIG_MAX_NAME,
-                                      DAILY_CONFIG_MIN_DEFAULT,
-                                      DAILY_CONFIG_MAX_DEFAULT)
+import modules.credits.settings as credit_settings
 
 Base = declarative_base()
 
@@ -46,7 +43,7 @@ def create_credit(session, user_id, commit=False):
     """
     credit = Credit(
         user_id=user_id,
-        credits=STARTING_CREDITS,
+        credits=credit_settings.STARTING_CREDITS,
     )
 
     session.add(credit)
@@ -162,42 +159,105 @@ def get_or_create_credit_action(session, user_id):
         return create_credit_action(session, user_id, True)
 
 
-def get_or_create_daily_range(session):
-    """Gets the range of daily values to give the the user. The range is
-    inclusive, i.e. [min, max]. If either the daily minimum or maximum is not
-    found, they will be created using the default in the settings.
+def get_or_create_config(session, name, default, commit=False):
+    """Gets or creates a config using the name and default.
 
     :param session: The sqlalchemy session to use to query for the daily range
     in the config table.
     :type session: sqlalchemy session
-    :returns: (int, int) -- The (min, max) of daily values that can be awarded
+    :param name: The name of the config. Used to search in the database for the
+    value.
+    :type name: string.
+    :param default: The value to set to if the config does not exist.
+    :type default: string.
+    :param commit: Whether to commit the creation of a new config (if any).
+    :type commit: bool.
+    :returns: Config model object of the config gotten or created.
     """
-    min_query = session.query(Config).filter_by(
-        name=DAILY_CONFIG_MIN_NAME).all()
+    config_query = session.query(Config).filter_by(name=name).all()
 
-    if not min_query:
-        # Create and default to DAILY_CONFIG_MIN_DEFAULT
-        min_config = Config(
-            name=DAILY_CONFIG_MIN_NAME,
-            value=DAILY_CONFIG_MIN_DEFAULT,
-        )
+    if not config_query:
+        config = Config(name=name, value=default)
+        session.add(config)
 
-        session.add(min_config)
+        if commit:
+            session.commit()
     else:
-        min_config = min_query[0]
+        config = config_query[0]
 
-    max_query = session.query(Config).filter_by(
-        name=DAILY_CONFIG_MAX_NAME).all()
+    return config
 
-    if not max_query:
-        max_config = Config(
-            name=DAILY_CONFIG_MAX_NAME,
-            value=DAILY_CONFIG_MAX_DEFAULT,
-        )
 
-        session.add(max_config)
-    else:
-        max_config = max_query[0]
+def get_or_create_daily_range(session):
+    """Gets the range of daily values to give the the user. The range is
+    inclusive, i.e. [min, max]. If either the daily minimum or maximum is not
+    found, they will be created using the default in the settings.
+    Commits the session.
+
+    :param session: The sqlalchemy session to use to query for the daily range
+    in the config table.
+    :type session: sqlalchemy session
+    :returns: (object, object) -- The (min, max) Config model objects of daily
+    values that can be awarded
+    """
+    min_config = get_or_create_config(
+        session, credit_settings.DAILY_CONFIG_MIN_NAME,
+        credit_settings.DAILY_CONFIG_MIN_DEFAULT)
+
+    max_config = get_or_create_config(
+        session, credit_settings.DAILY_CONFIG_MAX_NAME,
+        credit_settings.DAILY_CONFIG_MAX_DEFAULT)
+
+    session.commit()
+
+    return (min_config, max_config)
+
+
+def get_or_create_randpp_amt_range(session):
+    """Gets the range of values given to the the user for being active. The
+    range is inclusive, i.e. [min, max]. If either the minimum or maximum is
+    not found, they will be created using the default in the settings.
+    Commits the session.
+
+    :param session: The sqlalchemy session to use to query for the activeness
+    reward range in the config table.
+    :type session: sqlalchemy session
+    :returns: (object, object) -- The (min, max) Config model objects of the
+    activeness values that can be awarded
+    """
+    min_config = get_or_create_config(
+        session, credit_settings.HOOK_USER_ACTIVITY_CONFIG_MAX_AMT_NAME,
+        credit_settings.HOOK_USER_ACTIVITY_CONFIG_MIN_AMT_DEFAULT)
+
+    max_config = get_or_create_config(
+        session, credit_settings.HOOK_USER_ACTIVITY_CONFIG_MAX_AMT_NAME,
+        credit_settings.HOOK_USER_ACTIVITY_CONFIG_MAX_AMT_DEFAULT)
+
+    session.commit()
+
+    return (min_config, max_config)
+
+
+def get_or_create_randpp_time_range(session):
+    """Gets the range of minutes before the user is given credits for being
+    active. The range is inclusive, i.e. [min, max]. If either the minimum or
+    maximum is not found, they will be created using the default in the
+    settings.
+    Commits the session.
+
+    :param session: The sqlalchemy session to use to query for the activeness
+    time range in the config table.
+    :type session: sqlalchemy session
+    :returns: (object, object) -- The (min, max) Config model objects of the
+    activeness times that can be awarded
+    """
+    min_config = get_or_create_config(
+        session, credit_settings.HOOK_USER_ACTIVITY_CONFIG_MAX_TIME_NAME,
+        credit_settings.HOOK_USER_ACTIVITY_CONFIG_MIN_TIME_DEFAULT)
+
+    max_config = get_or_create_config(
+        session, credit_settings.HOOK_USER_ACTIVITY_CONFIG_MAX_TIME_NAME,
+        credit_settings.HOOK_USER_ACTIVITY_CONFIG_MAX_TIME_DEFAULT)
 
     session.commit()
 
