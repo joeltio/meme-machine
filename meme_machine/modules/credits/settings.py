@@ -47,3 +47,7 @@ HOOK_USER_ACTIVITY_CONFIG_MIN_TIME_DEFAULT = 1
 HOOK_USER_ACTIVITY_CONFIG_MAX_TIME_DEFAULT = 5
 
 HOOK_USER_ACTIVITY_SUCCESS = "{mention} has just gotten {amount}PP!"
+
+# Admin randpp config messages
+ADMIN_RANDPP_AMT_SUCCESS = ("New activeness random PP range set to "
+                            "{start}PP-{end}PP")

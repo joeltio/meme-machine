@@ -262,3 +262,32 @@ async def hook_user_activity(client, message):
     success_message = credit_settings.HOOK_USER_ACTIVITY_SUCCESS.format(
         amount=amount, mention=discord_user.mention)
     await client.send_message(message.channel, success_message)
+
+
+@base_helpers.limit_command_arg(2)
+async def admin_randpp_amt(client, message, str_new_min, str_new_max):
+    # Validate arguments
+    error = (credit_helpers.validate_credit_arg(str_new_min) or
+             credit_helpers.validate_credit_arg(str_new_max) or
+             credit_helpers.validate_credit_range(
+                 int(str_new_min), int(str_new_max)))
+
+    if error is not None:
+        await client.send_message(message.channel, error)
+        return
+
+    session = main_db.create_session()
+
+    min_config, max_config = \
+        credit_models.get_or_create_randpp_amt_range(session)
+
+    min_config.value = str_new_min
+    max_config.value = str_new_max
+
+    session.commit()
+    session.close()
+
+    success_message = credit_settings.ADMIN_RANDPP_AMT_SUCCESS.format(
+        start=str_new_min, end=str_new_max)
+
+    await client.send_message(message.channel, success_message)
