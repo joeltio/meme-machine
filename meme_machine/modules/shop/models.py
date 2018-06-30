@@ -32,3 +32,33 @@ class Transaction(Base):
     initiator_user_id = Column(Integer, ForeignKey(User.id), nullable=False)
     item_id = Column(Integer, ForeignKey(ShopItem.id), nullable=False)
     status = Column(Integer, nullable=False)
+
+
+def get_shop_items(session):
+    """Retrieves all the shop items
+
+    :param session: The sqlalchemy session to use to get the shop items
+    :type session: sqlalchemy session.
+    :returns: list[object] -- A list of the database ShopItem models.
+    """
+    query = session.query(ShopItem).all()
+
+    return query
+
+
+def get_shop_category(session, id):
+    """Retrieves the database ShopItemCategory model associated with the id
+
+    :param session: The sqlalchemy session to use to get the shop category
+    :type session: sqlalchemy session.
+    :param id: The id of the shop category
+    :type id: int.
+    :returns: object|None -- The database ShopItemCategory model if found, None
+    if there is no such record.
+    """
+    query = session.query(ShopItemCategory).filter_by(id=id).all()
+
+    if query:
+        return query[0]
+    else:
+        return None
