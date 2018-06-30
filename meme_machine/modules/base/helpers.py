@@ -1,7 +1,4 @@
-from modules.base.settings import (MENTION_ERROR_TOO_FEW,
-                                   MENTION_ERROR_TOO_MANY,
-                                   MENTION_ERROR_BOT_MENTIONED,
-                                   INT_ERROR_NOT_VALID)
+import modules.base.settings as base_settings
 
 
 def limit_command_arg(num_args):
@@ -34,11 +31,11 @@ def validate_num_of_mentions(mentions, num, user_only=True):
     error message otherwise.
     """
     if len(mentions) > num:
-        return MENTION_ERROR_TOO_MANY
+        return base_settings.MENTION_ERROR_TOO_MANY
     elif len(mentions) < num:
-        return MENTION_ERROR_TOO_FEW
+        return base_settings.MENTION_ERROR_TOO_FEW
     elif user_only and any(map(lambda x: x.bot, mentions)):
-        return MENTION_ERROR_BOT_MENTIONED
+        return base_settings.MENTION_ERROR_BOT_MENTIONED
     else:
         return None
 
@@ -56,10 +53,10 @@ def validate_is_int(num, only_positive=True):
     # If the number is positive
     if only_positive or num[0] != "-":
         if not num.isdigit():
-            return INT_ERROR_NOT_VALID
+            return base_settings.INT_ERROR_NOT_VALID
         return None
 
     # The number is negative
     if not num[1:].isdigit():
-        return INT_ERROR_NOT_VALID
+        return base_settings.INT_ERROR_NOT_VALID
     return None
