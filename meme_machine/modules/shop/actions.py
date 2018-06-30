@@ -7,8 +7,7 @@ import modules.shop.models as shop_models
 import modules.shop.helpers as shop_helpers
 
 
-@base_helpers.limit_command_arg(0)
-async def shop(client, message):
+async def _shop(client, message, only_in_stock=True):
     session = main_db.create_session()
     organized_items = shop_helpers.get_and_organize_items(session)
 
@@ -24,7 +23,7 @@ async def shop(client, message):
         items_text = ""
         for item in items:
             # Skip if there is not stock
-            if item.stock == 0:
+            if only_in_stock and item.stock == 0:
                 continue
 
             item_code_name = shop_helpers.to_code_name(item.name)
@@ -56,3 +55,13 @@ async def shop(client, message):
     shop_display_message += shop_settings.SHOP_DISPLAY_FOOTER
 
     await client.send_message(message.channel, shop_display_message)
+
+
+@base_helpers.limit_command_arg(0)
+async def shop(client, message):
+    await _shop(client, message)
+
+
+@base_helpers.limit_command_arg(0)
+async def admin_shop(client, message):
+    await _shop(client, message, False)
