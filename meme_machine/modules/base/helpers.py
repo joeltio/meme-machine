@@ -8,13 +8,30 @@ def limit_command_arg(num_args):
     def decorator(f):
         async def wrapper(client, message, *args):
             if len(args) != num_args:
-                error_message = (
-                    "Error: Incorrect number of arguments. Expected {}. "
-                    "Given {}".format(num_args, len(args)))
+                error_message = base_settings.ARGUMENT_ERROR_WRONG_AMOUNT \
+                    .format(expected=num_args, given=len(args))
 
                 await client.send_message(message.channel, error_message)
             else:
                 await f(client, message, *args)
+
+        return wrapper
+    return decorator
+
+
+def min_collate_args(num_args):
+    """Decorator to pass the first `num_arg` of arguments and everything after
+    that is joined together with a space and used as a last argument."""
+    def decorator(f):
+        async def wrapper(client, message, *args):
+            if len(args) <= num_args:
+                error_message = base_settings.ARGUMENT_ERROR_WRONG_AMOUNT \
+                    .format(expected=">" + str(num_args), given=len(args))
+
+                await client.send_message(message.channel, error_message)
+            else:
+                rest = " ".join(args[num_args:])
+                await f(client, message, *args[:num_args], rest)
 
         return wrapper
     return decorator
@@ -82,3 +99,27 @@ def validate_is_range(start, end, allow_equals=True):
         return base_settings.RANGE_ERROR_START_EQ_END
 
     return None
+
+
+def validate_is_hex(val, digits):
+    """Validates that the value is a hexadecimal with the specified number of
+    digits and is represented in the format "0x0000".
+
+    :param val: The value to validate
+    :type val: str.
+    :param digits: The number of digits the value should have
+    :type digits: int.
+    :returns: str|None -- None if the argument is valid. A string with the
+    error message otherwise.
+    """
+    if digits <= 0:
+        return None
+    elif len(val) != (digits+2) or \
+            val[:2] != "0x":
+        return base_settings.HEX_ERROR_NOT_VALID.format(digits=digits)
+    else:
+        try:
+            int(val, 16)
+            return None
+        except ValueError:
+            return base_settings.HEX_ERROR_NOT_VALID.format(digits=digits)

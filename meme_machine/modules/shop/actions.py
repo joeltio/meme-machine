@@ -112,3 +112,64 @@ async def admin_set_stock(client, message, category_code, item_code,
         item_name=item_name, new_stock=str_new_stock)
 
     await client.send_message(message.channel, success_message)
+
+
+@base_helpers.min_collate_args(2)
+async def admin_update_category(client, message, category_code, update_type,
+                                update_value):
+    # Validate arguments
+    # Check that the update type is a valid value
+    error = None
+    if update_type not in ["CODE", "THUMBNAIL_URL", "NAME", "COLOR"]:
+        error = shop_settings.ADMIN_UPDATE_CATEGORY_ERROR_INVALID_TYPE
+    elif update_type != "NAME" and " " in update_value:
+        error = shop_settings.ADMIN_UPDATE_CATEGORY_SPACES_NOT_ALLOWED
+    elif update_type == "COLOR":
+        error = base_helpers.validate_is_hex(update_value, 6)
+
+    if error is not None:
+        await client.send_message(message.channel, error)
+        return
+
+    session = main_db.create_session()
+
+    category = shop_models.get_shop_category(
+        session, category_code=category_code)
+
+    # Check if the category exists
+    if category is None:
+        await client.send_message(
+            message.channel,
+            shop_settings.ADMIN_UPDATE_CATEGORY_CATEGORY_DOES_NOT_EXIST)
+        session.close()
+        return
+
+    # Update the value accordingly
+    if update_type == "CODE":
+        # Check if a category with that code already exists
+        check_category = shop_models.get_shop_category(
+            session, category_code=update_value)
+
+        if check_category is not None:
+            error_message = shop_settings.ADMIN_UPDATE_CATEGORY_CODE_EXISTS
+            await client.send_message(message.channel, error_message)
+            session.close()
+            return
+
+        category.code_name = update_value
+    elif update_type == "THUMBNAIL_URL":
+        category.thumbnail_url = update_value
+    elif update_type == "NAME":
+        category.display_name = update_value
+    else:
+        # update_value should be a color "0x000000"
+        # Only take and store the 6 digits
+        category.color = update_value[2:]
+
+    session.commit()
+    session.close()
+
+    success_message = shop_settings.ADMIN_UPDATE_CATEGORY_SUCCESS.format(
+        update_type=update_type.lower(), update_value=update_value)
+
+    await client.send_message(message.channel, success_message)
