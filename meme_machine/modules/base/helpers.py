@@ -40,18 +40,18 @@ def validate_num_of_mentions(mentions, num, user_only=True):
         return None
 
 
-def validate_is_int(num, only_positive=False):
+def validate_is_int(num, disallow_negative=False):
     """Validates that the number is an integer.
 
     :param num: The number to validate
     :type num: str.
-    :param only_positive: Whether the number should only be positive
-    :type only_positive: bool.
+    :param disallow_negative: Whether the number should not be negative
+    :type disallow_negative: bool.
     :returns: str|None -- None if the argument is valid. A string with the
     error message otherwise.
     """
-    # If the number is positive
-    if only_positive or num[0] != "-":
+    # If the number >= 0
+    if disallow_negative or num[0] != "-":
         if not num.isdigit():
             return base_settings.INT_ERROR_NOT_VALID
         return None
