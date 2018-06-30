@@ -180,7 +180,8 @@ async def daily(client, message):
         sender_credit.credits += amount
 
         # Update next_daily
-        sender_credit_action.next_daily = datetime.now() + timedelta(days=1)
+        daily_interval = timedelta(hours=credit_settings.DAILY_INTERVAL_HOURS)
+        sender_credit_action.next_daily = datetime.now() + daily_interval
 
         result_message = credit_settings.DAILY_SUCCESS.format(
             amount=amount, mention=sender_discord.mention)

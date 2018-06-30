@@ -35,6 +35,9 @@ DAILY_SUCCESS = "{mention} has just gotten {amount}PP!"
 ADMIN_DAILY_AMT_SUCCESS = ("Successfully updated daily range to "
                            "{start}PP-{end}PP")
 
+# Daily other config
+DAILY_INTERVAL_HOURS = 21
+
 # Activeness config for database retrieval
 HOOK_USER_ACTIVITY_CONFIG_MIN_TIME_NAME = "user_activity_min_time"
 HOOK_USER_ACTIVITY_CONFIG_MAX_TIME_NAME = "user_activity_max_time"
