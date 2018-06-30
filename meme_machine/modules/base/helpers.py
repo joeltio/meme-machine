@@ -40,7 +40,7 @@ def validate_num_of_mentions(mentions, num, user_only=True):
         return None
 
 
-def validate_is_int(num, only_positive=True):
+def validate_is_int(num, only_positive=False):
     """Validates that the number is an integer.
 
     :param num: The number to validate
@@ -59,4 +59,26 @@ def validate_is_int(num, only_positive=True):
     # The number is negative
     if not num[1:].isdigit():
         return base_settings.INT_ERROR_NOT_VALID
+    return None
+
+
+def validate_is_range(start, end, allow_equals=True):
+    """Validates that the start is smaller than the end. Assumes that the start
+    and end are valid floats.
+
+    :param start: The start of the range
+    :type start: str.
+    :param end: The end of the range
+    :type end: str.
+    :param allow_equals: Whether to allow the start to be equivalent to the end
+    :type allow_equals: bool.
+    :returns: str|None -- None if the argument is valid. A string with the
+    error message otherwise.
+    """
+    if float(start) > float(end):
+        return base_settings.RANGE_ERROR_START_AFTER_END
+
+    if not allow_equals and float(start) == float(end):
+        return base_settings.RANGE_ERROR_START_EQ_END
+
     return None

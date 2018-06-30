@@ -14,7 +14,7 @@ def validate_credit_arg(arg, only_positive=True):
     :returns: str|None -- None if the argument is valid. A string with the
     error message otherwise.
     """
-    if not base_helpers.validate_is_int(arg):
+    if base_helpers.validate_is_int(arg, True) is not None:
         return CREDIT_ERROR_INVALID_AMOUNT_TYPE
     else:
         return None
@@ -30,7 +30,7 @@ def validate_credit_range(start, end):
     :returns: str|None -- None if the argument is valid. A string with the
     error message otherwise.
     """
-    if start >= end:
+    if base_helpers.validate_is_range(start, end, False) is not None:
         return CREDIT_ERROR_REVERSED_RANGE
     else:
         return None
