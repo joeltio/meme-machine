@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, TIMESTAMP, ForeignKey, CheckConstraint
+from sqlalchemy import Column, Integer, DateTime, ForeignKey, CheckConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from modules.base.models import User, Config
 
@@ -21,8 +21,8 @@ class CreditAction(Base):
     __tablename__ = "credit_action"
 
     user_id = Column(Integer, ForeignKey(User.id), primary_key=True)
-    next_active = Column(TIMESTAMP, nullable=False)
-    next_daily = Column(TIMESTAMP, nullable=False)
+    next_active = Column(DateTime, nullable=False)
+    next_daily = Column(DateTime, nullable=False)
 
 
 def create_credit(session, user_id, commit=False):
