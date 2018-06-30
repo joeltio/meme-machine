@@ -19,7 +19,7 @@ depends_on = None
 def upgrade():
     # Only works if there is no data
     with op.batch_alter_table("shop_item", schema=None) as batch_op:
-        batch_op.add_column(sa.Column("code_name", sa.String(),
+        batch_op.add_column(sa.Column("code_name", sa.String,
                                       server_default="", nullable=False))
         batch_op.alter_column("code_name", server_default=None)
 
