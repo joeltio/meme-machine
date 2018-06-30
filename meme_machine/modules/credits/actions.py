@@ -291,3 +291,31 @@ async def admin_randpp_amt(client, message, str_new_min, str_new_max):
         start=str_new_min, end=str_new_max)
 
     await client.send_message(message.channel, success_message)
+
+
+@base_helpers.limit_command_arg(2)
+async def admin_randpp_time(client, message, str_new_min, str_new_max):
+    # Validate arguments
+    error = (base_helpers.validate_is_int(str_new_min, True) or
+             base_helpers.validate_is_int(str_new_max, True) or
+             base_helpers.validate_is_range(str_new_min, str_new_max))
+
+    if error is not None:
+        await client.send_message(message.channel, error)
+        return
+
+    session = main_db.create_session()
+
+    min_config, max_config = \
+        credit_models.get_or_create_randpp_time_range(session)
+
+    min_config.value = str_new_min
+    max_config.value = str_new_max
+
+    session.commit()
+    session.close()
+
+    success_message = credit_settings.ADMIN_RANDPP_TIME_SUCCESS.format(
+        start=str_new_min, end=str_new_max)
+
+    await client.send_message(message.channel, success_message)
