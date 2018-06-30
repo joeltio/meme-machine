@@ -22,11 +22,12 @@ def validate_credit_arg(arg, only_positive=True):
 
 def validate_credit_range(start, end):
     """Validates that the starting range is smaller than the ending range.
+    Assumes that the start and end of the range are valid floats.
 
     :param start: The start of the credit range
-    :type start: int.
+    :type start: str.
     :param end: The end of the credit range
-    :type start: int.
+    :type start: str.
     :returns: str|None -- None if the argument is valid. A string with the
     error message otherwise.
     """

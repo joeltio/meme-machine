@@ -196,8 +196,7 @@ async def admin_daily_amt(client, message, str_new_min, str_new_max):
     # Validate arguments
     error = (credit_helpers.validate_credit_arg(str_new_min) or
              credit_helpers.validate_credit_arg(str_new_max) or
-             credit_helpers.validate_credit_range(
-                 int(str_new_min), int(str_new_max)))
+             credit_helpers.validate_credit_range(str_new_min, str_new_max))
 
     if error is not None:
         await client.send_message(message.channel, error)
@@ -269,8 +268,7 @@ async def admin_randpp_amt(client, message, str_new_min, str_new_max):
     # Validate arguments
     error = (credit_helpers.validate_credit_arg(str_new_min) or
              credit_helpers.validate_credit_arg(str_new_max) or
-             credit_helpers.validate_credit_range(
-                 int(str_new_min), int(str_new_max)))
+             credit_helpers.validate_credit_range(str_new_min, str_new_max))
 
     if error is not None:
         await client.send_message(message.channel, error)
@@ -317,5 +315,39 @@ async def admin_randpp_time(client, message, str_new_min, str_new_max):
 
     success_message = credit_settings.ADMIN_RANDPP_TIME_SUCCESS.format(
         start=str_new_min, end=str_new_max)
+
+    await client.send_message(message.channel, success_message)
+
+
+@base_helpers.limit_command_arg(3)
+async def admin_randpp(client, message, receiver_tag, str_start, str_end):
+    # Validate arguments
+    error = (credit_helpers.validate_credit_arg(str_start) or
+             credit_helpers.validate_credit_arg(str_end) or
+             credit_helpers.validate_credit_range(str_start, str_end) or
+             base_helpers.validate_num_of_mentions(message.mentions, 1))
+
+    if error is not None:
+        await client.send_message(message.channel, error)
+        return
+
+    receiver_discord = message.mentions[0]
+    amount = random.randint(int(str_start), int(str_end))
+
+    session = main_db.create_session()
+
+    # Get the user's credit from the user
+    receiver_user = base_models.get_or_create_user(session, receiver_discord)
+    receiver_credit = credit_models.get_or_create_credit(
+        session, receiver_user.id)
+
+    # Give amount
+    receiver_credit.credits += amount
+
+    session.commit()
+    session.close()
+
+    success_message = credit_settings.ADMIN_RANDPP_SUCCESS.format(
+        mention=receiver_discord.mention, amount=amount)
 
     await client.send_message(message.channel, success_message)

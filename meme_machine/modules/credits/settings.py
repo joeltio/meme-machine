@@ -53,3 +53,5 @@ ADMIN_RANDPP_AMT_SUCCESS = ("New activeness random PP range set to "
                             "{start}PP-{end}PP")
 ADMIN_RANDPP_TIME_SUCCESS = ("New activeness random time range set to "
                              "{start} minutes - {end} minutes")
+# Admin give rand pp success message
+ADMIN_RANDPP_SUCCESS = "You have given {mention} {amount}PP!"
