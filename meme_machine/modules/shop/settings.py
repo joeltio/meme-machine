@@ -1,39 +1,19 @@
-"""Shop display layout example result:
-<HEADER>
-<EACH_CATEGORY>
-<EACH_ITEM>
-<EACH_ITEM>
-<EACH_ITEM>
-<CATEGORY_SEP>
-<EACH_CATEGORY>
-<EACH_ITEM>
-<EACH_ITEM>
-<EACH_ITEM>
-<CATEGORY_SEP>
-<EACH_CATEGORY>
-<EACH_ITEM>
-<EACH_ITEM>
-<EACH_ITEM>
-<FOOTER>
+# Shop embed config
+SHOP_DISPLAY_EACH_ITEM_NAME = "{stock} x {name} [id: {code_name}]"
+SHOP_DISPLAY_EACH_ITEM_VALUE = "{cost}PP"
+SHOP_DISPLAY_NO_ITEMS = "No items"
 
-Required values to be formatted:
-SHOP_DISPLAY_EACH_ITEM - {name}, {code_name}, {cost}, {stock}
-SHOP_DISPLAY_EACH_CATEGRY - {name}, {code_name}
+# General shops config
+SHOP_ALL_AUTHOR_ICON = "https://i.imgur.com/3Dh1TDW.png"
 
-For example:
-SHOP_DISPLAY_EACH_ITEM = "{name} [id: {code_name}] - {cost}PP"
-SHOP_DISPLAY_EACH_CATEGORY = "{name} [id: {code_name}]"
+# Shop embed config
+SHOP_TITLE = "Panda Points Shop - {category_code}"
+SHOP_ERROR_NO_SUCH_CATEGORY = "Error: There is no category with that name."
 
-If there are no items (or all items are not in stock), only the
-SHOP_DISPLAY_NO_ITEMS will displayed.
-"""
-SHOP_DISPLAY_HEADER = "```Welcome to the PP Shop!\n"
-SHOP_DISPLAY_EACH_CATEGORY = "{name} (id: {code_name}):"
-SHOP_DISPLAY_EACH_ITEM = "{stock:<3}x{name} [id: {code_name}] - {cost}PP"
-SHOP_DISPLAY_CATEGORY_SEP = "\n"
-SHOP_DISPLAY_FOOTER = "```"
-SHOP_DISPLAY_NO_ITEMS = ("Looks like there are no items right now. Check back "
-                         "again later!")
+# Shops embed config
+SHOPS_TITLE = "Panda Points Shops"
+SHOPS_COLOR = 0x000000
+SHOPS_VALUE = "Category Code: `{category_code}`"
 
 # Admin set stock config
 ADMIN_SET_STOCK_ERROR_NO_SUCH_ITEM = "Error: There is no such item."

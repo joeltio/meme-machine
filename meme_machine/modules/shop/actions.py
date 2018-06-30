@@ -1,69 +1,84 @@
+import discord
+
 import database as main_db
 
 import modules.base.helpers as base_helpers
 
 import modules.shop.settings as shop_settings
 import modules.shop.models as shop_models
-import modules.shop.helpers as shop_helpers
 
 
-async def _shop(client, message, only_in_stock=True):
+async def _shop(client, message, category_code, only_in_stock=True):
     session = main_db.create_session()
-    organized_items = shop_helpers.get_and_organize_items(session)
 
-    all_items = []
-    for cat_id, items in organized_items.items():
-        category = shop_models.get_shop_category(session, id=cat_id)
+    category = shop_models.get_shop_category(
+        session, category_code=category_code)
 
-        # Create the text for each category
-        category_text = shop_settings.SHOP_DISPLAY_EACH_CATEGORY.format(
-            name=category.display_name, code_name=category.code_name) + "\n"
+    if category is None:
+        await client.send_message(
+            message.channel, shop_settings.SHOP_ERROR_NO_SUCH_CATEGORY)
+        return
 
-        # Create the text for the items section of the category
-        items_text = ""
-        for item in items:
-            # Skip if there is not stock
-            if only_in_stock and item.stock == 0:
-                continue
+    items = shop_models.get_shop_items(
+        session, category_id=category.id)
 
-            item_text = shop_settings.SHOP_DISPLAY_EACH_ITEM.format(
-                name=item.name, code_name=item.code_name,
-                cost=item.cost, stock=item.stock)
+    # Create the embed
+    author_name = shop_settings.SHOP_TITLE.format(category_code=category_code)
+    embed = discord.Embed(title=category.display_name,
+                          color=int(category.color, 16))
+    embed.set_author(name=author_name,
+                     icon_url=shop_settings.SHOP_ALL_AUTHOR_ICON)
+    embed.set_thumbnail(url=category.thumbnail_url)
 
-            items_text += item_text + "\n"
-
-        # Add the category into the display message only if there are items
-        if items_text:
-            all_items.append(category_text + items_text)
+    # Create the items
+    for item in items:
+        # Skip if there is not stock
+        if only_in_stock and item.stock == 0:
+            continue
+        item_name = shop_settings.SHOP_DISPLAY_EACH_ITEM_NAME.format(
+            name=item.name, stock=item.stock, code_name=item.code_name)
+        item_value = shop_settings.SHOP_DISPLAY_EACH_ITEM_VALUE.format(
+            cost=item.cost)
+        embed.add_field(name=item_name, value=item_value, inline=False)
 
     session.close()
 
     # Display no items message if there are no items (or no items in stock)
-    if not all_items:
-        await client.send_message(
-            message.channel, shop_settings.SHOP_DISPLAY_NO_ITEMS)
-        return
+    if not items:
+        embed.add_field(name=shop_settings.SHOP_DISPLAY_NO_ITEMS,
+                        value=".", inline=False)
 
-    # Join the items with the category separator
-    category_separator = shop_settings.SHOP_DISPLAY_CATEGORY_SEP + "\n"
-    all_item_texts = category_separator.join(all_items)
-
-    # Put everything together
-    shop_display_message = shop_settings.SHOP_DISPLAY_HEADER + "\n"
-    shop_display_message += all_item_texts
-    shop_display_message += shop_settings.SHOP_DISPLAY_FOOTER
-
-    await client.send_message(message.channel, shop_display_message)
+    await client.send_message(message.channel, embed=embed)
 
 
-@base_helpers.limit_command_arg(0)
-async def shop(client, message):
-    await _shop(client, message)
+@base_helpers.limit_command_arg(1)
+async def shop(client, message, category_code):
+    await _shop(client, message, category_code)
+
+
+@base_helpers.limit_command_arg(1)
+async def admin_shop(client, message, category_code):
+    await _shop(client, message, category_code, False)
 
 
 @base_helpers.limit_command_arg(0)
-async def admin_shop(client, message):
-    await _shop(client, message, False)
+async def shops(client, message):
+    embed = discord.Embed(title=shop_settings.SHOPS_TITLE,
+                          color=shop_settings.SHOPS_COLOR)
+    embed.set_author(name=shop_settings.SHOPS_TITLE,
+                     icon_url=shop_settings.SHOP_ALL_AUTHOR_ICON)
+
+    session = main_db.create_session()
+
+    categories = shop_models.get_categories(session)
+    for category in categories:
+        value = shop_settings.SHOPS_VALUE.format(
+            category_code=category.code_name)
+        embed.add_field(name=category.display_name, value=value, inline=False)
+
+    session.close()
+
+    await client.send_message(message.channel, embed=embed)
 
 
 @base_helpers.limit_command_arg(3)

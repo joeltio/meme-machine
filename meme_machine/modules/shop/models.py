@@ -11,6 +11,8 @@ class ShopItemCategory(Base):
     id = Column(Integer, primary_key=True)
     display_name = Column(String, nullable=False)
     code_name = Column(String, nullable=False, unique=True)
+    color = Column(String, nullable=False)
+    thumbnail_url = Column(String(6), nullable=False)
 
 
 class ShopItem(Base):
@@ -35,16 +37,40 @@ class Transaction(Base):
     status = Column(Integer, nullable=False)
 
 
-def get_shop_items(session):
-    """Retrieves all the shop items
+def get_shop_items(session, category_code=None, category_id=None):
+    """Retrieves shop items that can be filtered by category.
 
     :param session: The sqlalchemy session to use to get the shop items
     :type session: sqlalchemy session.
+    :param category_code: The code of the category to filter by
+    :type category_code: str.
+    :param category_id: The id of the category to filter by
+    :type category_id: int.
     :returns: list[object] -- A list of the database ShopItem models.
     """
-    query = session.query(ShopItem).all()
+    if category_code is not None:
+        category = get_shop_category(session, category_code=category_code)
 
-    return query
+        if category is None:
+            return []
+
+        filters = {"category_id": category.id}
+    elif category_id is not None:
+        filters = {"category_id": category_id}
+    else:
+        return session.query(ShopItem).all()
+
+    return session.query(ShopItem).filter_by(**filters).all()
+
+
+def get_categories(session):
+    """Retrieves all the categories
+
+    :param session: The sqlalchemy session to use to get the categories
+    :type session: sqlalchemy session.
+    :returns: list[object] -- A list of the database ShopItemCategory models.
+    """
+    return session.query(ShopItemCategory).all()
 
 
 def get_shop_category(session, id=None, category_code=None):
