@@ -47,17 +47,78 @@ def get_shop_items(session):
     return query
 
 
-def get_shop_category(session, id):
-    """Retrieves the database ShopItemCategory model associated with the id
+def get_shop_category(session, id=None, category_code=None):
+    """Retrieves the database ShopItemCategory model associated with the id or
+    category code
 
     :param session: The sqlalchemy session to use to get the shop category
     :type session: sqlalchemy session.
     :param id: The id of the shop category
     :type id: int.
+    :param category_code: The category code
+    :type category_code: str.
     :returns: object|None -- The database ShopItemCategory model if found, None
     if there is no such record.
     """
-    query = session.query(ShopItemCategory).filter_by(id=id).all()
+    if (id or category_code) is None:
+        return None
+
+    filters = {
+        "id": id,
+        "code_name": category_code,
+    }
+
+    # Remove None values
+    filters = dict(filter(lambda x: x[1] is not None, filters.items()))
+
+    query = session.query(ShopItemCategory).filter_by(**filters).all()
+
+    if query:
+        return query[0]
+    else:
+        return None
+
+
+def get_shop_item(session, id=None, category_code=None, category_id=None,
+                  item_code=None):
+    """Retrieves the database ShopItem model using one of the following:
+    ```
+    (id)
+    (category_code, item_code)
+    (category_id, item_code)
+    ```
+
+    :param session: The sqlalchemy session to use to get the shop item
+    :type session: sqlalchemy session.
+    :param id: The id of the shop item
+    :type id: int.
+    :param category_code: The category code that the shop item belongs to
+    :type category_code: str.
+    :param category_id: The id of the category the shop item belongs to
+    :type category_id: int.
+    :param item_code: The shop item's code
+    :type item_code: str.
+    :returns: object|None -- The database ShopItem model if found, None if
+    there is no such record.
+    """
+    if id is not None:
+        # Only id
+        filters = {"id": id}
+    elif (category_code or item_code) is not None:
+        # Category and item code
+        category = get_shop_category(session, category_code=category_code)
+
+        if category is None:
+            return None
+
+        filters = {"code_name": item_code, "category_id": category.id}
+    elif (category_id or item_code) is not None:
+        # Category id and item code
+        filters = {"code_name": item_code, "category_id": category.id}
+    else:
+        return None
+
+    query = session.query(ShopItem).filter_by(**filters).all()
 
     if query:
         return query[0]

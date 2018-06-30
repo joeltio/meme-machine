@@ -34,3 +34,7 @@ SHOP_DISPLAY_CATEGORY_SEP = "\n"
 SHOP_DISPLAY_FOOTER = "```"
 SHOP_DISPLAY_NO_ITEMS = ("Looks like there are no items right now. Check back "
                          "again later!")
+
+# Admin set stock config
+ADMIN_SET_STOCK_ERROR_NO_SUCH_ITEM = "Error: There is no such item."
+ADMIN_SET_STOCK_SUCCESS = "Updated {item_name} stock to {new_stock}"

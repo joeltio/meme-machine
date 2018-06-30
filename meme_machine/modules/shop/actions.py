@@ -13,7 +13,7 @@ async def _shop(client, message, only_in_stock=True):
 
     all_items = []
     for cat_id, items in organized_items.items():
-        category = shop_models.get_shop_category(session, cat_id)
+        category = shop_models.get_shop_category(session, id=cat_id)
 
         # Create the text for each category
         category_text = shop_settings.SHOP_DISPLAY_EACH_CATEGORY.format(
@@ -26,9 +26,8 @@ async def _shop(client, message, only_in_stock=True):
             if only_in_stock and item.stock == 0:
                 continue
 
-            item_code_name = shop_helpers.to_code_name(item.name)
             item_text = shop_settings.SHOP_DISPLAY_EACH_ITEM.format(
-                name=item.name, code_name=item_code_name,
+                name=item.name, code_name=item.code_name,
                 cost=item.cost, stock=item.stock)
 
             items_text += item_text + "\n"
@@ -65,3 +64,36 @@ async def shop(client, message):
 @base_helpers.limit_command_arg(0)
 async def admin_shop(client, message):
     await _shop(client, message, False)
+
+
+@base_helpers.limit_command_arg(3)
+async def admin_set_stock(client, message, category_code, item_code,
+                          str_new_stock):
+    # Validate arguments
+    error = base_helpers.validate_is_int(str_new_stock, True)
+
+    if error is not None:
+        await client.send_message(message.channel, error)
+        return
+
+    session = main_db.create_session()
+    item = shop_models.get_shop_item(session, category_code=category_code,
+                                     item_code=item_code)
+
+    # Error if there is no such item
+    if item is None:
+        await client.send_message(
+            message.channel, shop_settings.ADMIN_SET_STOCK_ERROR_NO_SUCH_ITEM)
+        session.close()
+        return
+
+    item.stock = str_new_stock
+    item_name = item.name
+
+    session.commit()
+    session.close()
+
+    success_message = shop_settings.ADMIN_SET_STOCK_SUCCESS.format(
+        item_name=item_name, new_stock=str_new_stock)
+
+    await client.send_message(message.channel, success_message)
