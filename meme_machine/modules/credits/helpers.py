@@ -1,3 +1,5 @@
+import modules.base.helpers as base_helpers
+
 from modules.credits.settings import (CREDIT_ERROR_INVALID_AMOUNT_TYPE,
                                       CREDIT_ERROR_REVERSED_RANGE)
 
@@ -12,16 +14,10 @@ def validate_credit_arg(arg, only_positive=True):
     :returns: str|None -- None if the argument is valid. A string with the
     error message otherwise.
     """
-    # If the number is positive
-    if only_positive or arg[0] != "-":
-        if not arg.isdigit():
-            return CREDIT_ERROR_INVALID_AMOUNT_TYPE
-        return None
-
-    # The number is negativ
-    if not arg[1:].isdigit():
+    if not base_helpers.validate_is_int(arg):
         return CREDIT_ERROR_INVALID_AMOUNT_TYPE
-    return None
+    else:
+        return None
 
 
 def validate_credit_range(start, end):
