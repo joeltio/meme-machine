@@ -19,6 +19,7 @@ class ShopItem(Base):
     category_id = Column(Integer, ForeignKey(ShopItemCategory.id),
                          nullable=False)
     name = Column(String, nullable=False)
+    code_name = Column(String, nullable=False)
     cost = Column(Integer, nullable=False)
     stock = Column(Integer, nullable=False)
     # Constraints

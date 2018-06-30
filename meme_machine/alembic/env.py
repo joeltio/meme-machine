@@ -58,7 +58,10 @@ def run_migrations_online():
     with connectable.connect() as connection:
         context.configure(
             connection=connection,
-            target_metadata=target_metadata
+            target_metadata=target_metadata,
+            # Render migrations as batch because the sqlite does not allow
+            # table alteration.
+            render_as_batch=True
         )
 
         with context.begin_transaction():
