@@ -16,8 +16,8 @@ DONATE_SUCCESS = "You have donated {amount}PP to {receiver}!"
 
 # Admin add and remove command constants
 # Requires {amount} and {receiver}
-ADMIN_ADD_SUCCESS = "You have given {amount}PP to {receiver}"
-ADMIN_REMOVE_SUCCESS = "You have removed {amount}PP from {receiver}"
+ADMIN_ADD_SUCCESS = "You have given {amount}PP to {receiver}!"
+ADMIN_REMOVE_SUCCESS = "You have removed {amount}PP from {receiver}!"
 
 # Daily config for database retrieval
 DAILY_CONFIG_MAX_NAME = "daily_max"
@@ -26,14 +26,14 @@ DAILY_CONFIG_MIN_DEFAULT = 5
 DAILY_CONFIG_MAX_DEFAULT = 15
 
 # Daily command messages
-DAILY_SECONDS_LEFT = "You have to wait {seconds} more seconds"
-DAILY_MINUTES_LEFT = "You have to wait {minutes} more minutes"
+DAILY_SECONDS_LEFT = "You have to wait {seconds} more seconds."
+DAILY_MINUTES_LEFT = "You have to wait {minutes} more minutes."
 DAILY_HOURS_AND_MINUTES_LEFT = ("You have to wait {hours} hours and {minutes} "
-                                "more minutes")
+                                "more minutes.")
 DAILY_SUCCESS = "{mention} has just gotten {amount}PP!"
 
 ADMIN_DAILY_AMT_SUCCESS = ("Successfully updated daily range to "
-                           "{start}PP-{end}PP")
+                           "{start}PP-{end}PP.")
 
 # Daily other config
 DAILY_INTERVAL_HOURS = 21
@@ -53,8 +53,8 @@ HOOK_USER_ACTIVITY_SUCCESS = "{mention} has just gotten {amount}PP!"
 
 # Admin randpp config messages
 ADMIN_RANDPP_AMT_SUCCESS = ("New activeness random PP range set to "
-                            "{start}PP-{end}PP")
+                            "{start}PP-{end}PP.")
 ADMIN_RANDPP_TIME_SUCCESS = ("New activeness random time range set to "
-                             "{start} minutes - {end} minutes")
+                             "{start} minutes - {end} minutes.")
 # Admin give rand pp success message
 ADMIN_RANDPP_SUCCESS = "You have given {mention} {amount}PP!"
