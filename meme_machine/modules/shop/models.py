@@ -3,6 +3,8 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from modules.base.models import User
 
+import modules.shop.helpers as shop_helpers
+
 Base = declarative_base()
 
 
@@ -150,3 +152,38 @@ def get_shop_item(session, id=None, category_code=None, category_id=None,
         return query[0]
     else:
         return None
+
+
+def create_shop_item(session, category_id, name, cost, stock, commit=False):
+    """Creates a new shop item record within the category. It is assumed that
+    the `category_id` already exists.
+    The code name of the shop item will be set using
+    `shop.helpers.to_code_name`.
+
+    :param session: The sqlalchemy session to use to create the shop item
+    :type session: sqlalchemy session.
+    :param category_id: The id of the category the item belongs to.
+    :type category_id: int.
+    :param name: The item's name
+    :type name: str.
+    :param cost: The item's cost
+    :type cost: int.
+    :param stock: How many items there are in the shop
+    :type stock: int.
+    :returns: object -- The database ShopItem model created/to be created
+    (Depending on whether it was committed).
+    """
+    shop_item = ShopItem(
+        category_id=category_id,
+        name=name,
+        code_name=shop_helpers.to_code_name(name),
+        cost=cost,
+        stock=stock
+    )
+
+    session.add(shop_item)
+
+    if commit:
+        session.commit()
+
+    return shop_item
