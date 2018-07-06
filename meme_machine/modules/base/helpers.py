@@ -19,19 +19,57 @@ def limit_command_arg(num_args):
     return decorator
 
 
-def min_collate_args(num_args):
-    """Decorator to pass the first `num_arg` of arguments and everything after
-    that is joined together with a space and used as a last argument."""
+def collate_args(before_collate, after_collate=0):
+    """Decorator to specify which part of the arguments to join. The argument
+    that is made from joining multiple arguments is called the collate
+    argument.
+
+    The first `before_collate` arguments will be passed in. The arguments from
+    `before_collate` onwards but before `after_collate` number of arguments
+    will be combined.
+
+    For example:
+    ```
+    @collate_args(2, 3)
+    def f(client, message, a, b, c, d, e, f):
+        pass
+
+    # This is how arguments will be passed
+    f(client, message,
+      arg[0], arg[1],               # 2 arguments are passed first
+      " ".join(arg[2:-3]),           # The arguments in between are joined
+      arg[-3], arg[-2], arg[-1])    # 3 arguments at the back are passed
+    ```
+
+    :param before_collate: The number of arguments there should be before the
+    collate argument
+    :type before_collate: int.
+    :param after_collate: The number of arguments there should be after the
+    collate argument
+    :type after_collate: int.
+    :returns: decorator
+    """
     def decorator(f):
         async def wrapper(client, message, *args):
-            if len(args) <= num_args:
+            expected_num_args = before_collate + after_collate + 1
+            if len(args) < expected_num_args:
                 error_message = base_settings.ARGUMENT_ERROR_WRONG_AMOUNT \
-                    .format(expected=">" + str(num_args), given=len(args))
+                    .format(expected=">" + str(expected_num_args),
+                            given=len(args))
 
                 await client.send_message(message.channel, error_message)
             else:
-                rest = " ".join(args[num_args:])
-                await f(client, message, *args[:num_args], rest)
+                before_args = args[:before_collate]
+
+                if after_collate == 0:
+                    collate_arg = " ".join(args[before_collate:])
+                    after_args = []
+                else:
+                    collate_arg = " ".join(args[before_collate:-after_collate])
+                    after_args = args[-after_collate:]
+
+                await f(client, message, *before_args,
+                        collate_arg, *after_args)
 
         return wrapper
     return decorator

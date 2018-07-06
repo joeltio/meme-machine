@@ -114,7 +114,7 @@ async def admin_set_stock(client, message, category_code, item_code,
     await client.send_message(message.channel, success_message)
 
 
-@base_helpers.min_collate_args(2)
+@base_helpers.collate_args(2)
 async def admin_update_category(client, message, category_code, update_type,
                                 update_value):
     # Validate arguments
