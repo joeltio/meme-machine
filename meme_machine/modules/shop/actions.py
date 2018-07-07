@@ -225,3 +225,57 @@ async def admin_add_item(client, message, category_code, name,
         stock=stock, name=name, cost=cost, category_name=category_name)
 
     await client.send_message(message.channel, success_message)
+
+
+@base_helpers.limit_command_arg(2)
+async def admin_remove_item(client, message, category_code, item_code):
+    # Validate arguments
+    session = main_db.create_session()
+
+    category = shop_models.get_shop_category(
+        session, category_code=category_code)
+
+    # Check if the category exists
+    if category is None:
+        await client.send_message(
+            message.channel,
+            shop_settings.SHOP_ERROR_NO_SUCH_CATEGORY)
+        session.close()
+        return
+
+    # Check if item exists in the category
+    shop_item = shop_models.get_shop_item(
+        session, category_id=category.id, item_code=item_code)
+
+    if shop_item is None:
+        await client.send_message(
+            message.channel,
+            shop_settings.ADMIN_REMOVE_ITEM_ERROR_ITEM_DOES_NOT_EXIST)
+        session.close()
+        return
+
+    # Check if item is in any open transaction
+    transactions = shop_models.get_transactions(
+        session, item_id=shop_item.id,
+        status=shop_settings.TRANSACTION_DB_STATUS_PENDING)
+
+    if transactions:
+        await client.send_message(
+            message.channel,
+            shop_settings.ADMIN_REMOVE_ITEM_ERROR_ITEM_HAS_PENDING_TRANSACTION)
+        session.close()
+        return
+
+    # Remove item
+    session.delete(shop_item)
+
+    item_name = shop_item.name
+    category_name = category.display_name
+
+    session.commit()
+    session.close()
+
+    success_message = shop_settings.ADMIN_REMOVE_ITEM_SUCCESS.format(
+        name=item_name, category_name=category_name)
+
+    await client.send_message(message.channel, success_message)

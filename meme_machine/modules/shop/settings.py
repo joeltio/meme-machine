@@ -1,3 +1,7 @@
+# Transaction database config
+TRANSACTION_DB_STATUS_PENDING = "PENDING"
+TRANSACTION_DB_STATUS_COMPLETE = "COMPLETE"
+
 # Validation config
 SHOP_ERROR_NO_SUCH_CATEGORY = "Error: There is no category with that name."
 
@@ -35,3 +39,9 @@ ADMIN_UPDATE_CATEGORY_SUCCESS = "Updated {update_type} to {update_value}."
 ADMIN_ADD_ITEM_ERROR_ITEM_ALREADY_EXISTS = ("Error: An item with that name "
                                             "already exists.")
 ADMIN_ADD_ITEM_SUCCESS = "Added {stock} {name} to {category_name} for {cost}."
+
+# Admin remove item config
+ADMIN_REMOVE_ITEM_ERROR_ITEM_DOES_NOT_EXIST = "Error: The item does not exist."
+ADMIN_REMOVE_ITEM_ERROR_ITEM_HAS_PENDING_TRANSACTION = \
+    "Error: The item still has pending transactions"
+ADMIN_REMOVE_ITEM_SUCCESS = "Removed {name} from {category_name}."
