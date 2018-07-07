@@ -81,7 +81,7 @@ async def admin_add(client, message, receiver_tag, str_amount):
     # Start a session
     session = main_db.create_session()
 
-    receiver_user = credit_models.get_or_create_user(session, receiver_discord)
+    receiver_user = base_models.get_or_create_user(session, receiver_discord)
     receiver_credit = credit_models.get_or_create_credit(
         session, receiver_user.id)
 
@@ -112,7 +112,7 @@ async def admin_remove(client, message, receiver_tag, str_amount):
     # Start a session
     session = main_db.create_session()
 
-    receiver_user = credit_models.get_or_create_user(session, receiver_discord)
+    receiver_user = base_models.get_or_create_user(session, receiver_discord)
     receiver_credit = credit_models.get_or_create_credit(
         session, receiver_user.id)
 
