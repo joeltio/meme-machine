@@ -86,6 +86,31 @@ def get_categories(session):
     return session.query(ShopItemCategory).all()
 
 
+def get_transactions(session, initiator_id=None, item_id=None, status=None):
+    """Retrieves all the transactions filtered by the initiator's id,
+    item's id and/or status.
+
+    :param session: The sqlalchemy session to use to get the transactions
+    :type session: sqlalchemy session.
+    :param initiator_id: Filter the transaction's initiator's user id
+    :type initiator_id: int.
+    :param item_id: Filter the transaction's item's id
+    :type item_id: int.
+    :param status: Filter the status of the transaction
+    :type status: str.
+    :returns: list[objects] -- A list of the database Transaction models.
+    """
+    filters = {}
+    if initiator_id is not None:
+        filters["initiator_id"] = initiator_id
+    if item_id is not None:
+        filters["item_id"] = item_id
+    if status is not None:
+        filters["status"] = status
+
+    return session.query(Transaction).filter_by(**filters).all()
+
+
 def get_shop_category(session, id=None, category_code=None):
     """Retrieves the database ShopItemCategory model associated with the id or
     category code
@@ -166,6 +191,24 @@ def get_shop_item(session, id=None, category_code=None, category_id=None,
         return None
 
     query = session.query(ShopItem).filter_by(**filters).all()
+
+    if query:
+        return query[0]
+    else:
+        return None
+
+
+def get_transaction(session, id):
+    """Retrieves the database Transaction model using the transaction id.
+
+    :param session: The sqlalchemy session to use to get the transaction
+    :type session: sqlalchemy session.
+    :param id: The transaction's id
+    :type id: int.
+    :returns: object|None -- The database Transaction model if found, None if
+    there is no such record.
+    """
+    query = session.query(Transaction).filter_by(id=id).all()
 
     if query:
         return query[0]
