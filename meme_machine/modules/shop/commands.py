@@ -1,5 +1,5 @@
 from modules.shop.actions import (shop, shops, admin_shop, admin_set_stock,
-                                  admin_update_category)
+                                  admin_update_category, admin_add_item)
 
 COMMANDS = {
     "shop": shop,
@@ -7,4 +7,5 @@ COMMANDS = {
     "admin-shop": admin_shop,
     "admin-set-stock": admin_set_stock,
     "admin-update-category": admin_update_category,
+    "admin-add-item": admin_add_item,
 }

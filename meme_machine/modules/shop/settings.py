@@ -1,3 +1,6 @@
+# Validation config
+SHOP_ERROR_NO_SUCH_CATEGORY = "Error: There is no category with that name."
+
 # Shop embed config
 SHOP_DISPLAY_EACH_ITEM_NAME = "{stock} x {name} [id: {code_name}]"
 SHOP_DISPLAY_EACH_ITEM_VALUE = "{cost}PP"
@@ -8,7 +11,6 @@ SHOP_ALL_AUTHOR_ICON = "https://i.imgur.com/3Dh1TDW.png"
 
 # Shop embed config
 SHOP_TITLE = "Panda Points Shop - {category_code}"
-SHOP_ERROR_NO_SUCH_CATEGORY = "Error: There is no category with that name."
 
 # Shops embed config
 SHOPS_TITLE = "Panda Points Shops"
@@ -27,6 +29,9 @@ ADMIN_UPDATE_CATEGORY_SPACES_NOT_ALLOWED = ("Error: This update type should "
                                             "not have spaces in its values")
 ADMIN_UPDATE_CATEGORY_CODE_EXISTS = ("Error: A category with that code "
                                      "already exists")
-ADMIN_UPDATE_CATEGORY_CATEGORY_DOES_NOT_EXIST = \
-    "Error: There is no such category"
-ADMIN_UPDATE_CATEGORY_SUCCESS = "Updated {update_type} to {update_value}"
+ADMIN_UPDATE_CATEGORY_SUCCESS = "Updated {update_type} to {update_value}."
+
+# Admin add item config
+ADMIN_ADD_ITEM_ERROR_ITEM_ALREADY_EXISTS = ("Error: An item with that name "
+                                            "already exists.")
+ADMIN_ADD_ITEM_SUCCESS = "Added {stock} {name} to {category_name} for {cost}."

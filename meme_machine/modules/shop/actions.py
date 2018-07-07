@@ -4,6 +4,8 @@ import database as main_db
 
 import modules.base.helpers as base_helpers
 
+import modules.credits.helpers as credit_helpers
+
 import modules.shop.settings as shop_settings
 import modules.shop.models as shop_models
 
@@ -140,7 +142,7 @@ async def admin_update_category(client, message, category_code, update_type,
     if category is None:
         await client.send_message(
             message.channel,
-            shop_settings.ADMIN_UPDATE_CATEGORY_CATEGORY_DOES_NOT_EXIST)
+            shop_settings.SHOP_ERROR_NO_SUCH_CATEGORY)
         session.close()
         return
 
@@ -171,5 +173,55 @@ async def admin_update_category(client, message, category_code, update_type,
 
     success_message = shop_settings.ADMIN_UPDATE_CATEGORY_SUCCESS.format(
         update_type=update_type.lower(), update_value=update_value)
+
+    await client.send_message(message.channel, success_message)
+
+
+@base_helpers.collate_args(1, 2)
+async def admin_add_item(client, message, category_code, name,
+                         str_cost, str_stock):
+    # Validate arguments
+    error = (credit_helpers.validate_credit_arg(str_cost) or
+             base_helpers.validate_is_int(str_stock, True))
+
+    if error is not None:
+        await client.send_message(message.channel, error)
+        return
+
+    session = main_db.create_session()
+
+    category = shop_models.get_shop_category(
+        session, category_code=category_code)
+
+    # Check if the category exists
+    if category is None:
+        await client.send_message(
+            message.channel,
+            shop_settings.SHOP_ERROR_NO_SUCH_CATEGORY)
+        session.close()
+        return
+
+    # Check if item already exists in the category
+    shop_item = shop_models.get_shop_item(
+        session, category_id=category.id, item_name=name)
+
+    if shop_item is not None:
+        await client.send_message(
+            message.channel,
+            shop_settings.ADMIN_ADD_ITEM_ERROR_ITEM_ALREADY_EXISTS)
+        session.close()
+        return
+
+    cost = int(str_cost)
+    stock = int(str_stock)
+    category_name = category.display_name
+
+    shop_models.create_shop_item(session, category.id, name, cost, stock)
+
+    session.commit()
+    session.close()
+
+    success_message = shop_settings.ADMIN_ADD_ITEM_SUCCESS.format(
+        stock=stock, name=name, cost=cost, category_name=category_name)
 
     await client.send_message(message.channel, success_message)
