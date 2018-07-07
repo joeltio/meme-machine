@@ -153,7 +153,7 @@ async def admin_update_category(client, message, category_code, update_type,
             session, category_code=update_value)
 
         if check_category is not None:
-            error_message = shop_settings.ADMIN_UPDATE_CATEGORY_CODE_EXISTS
+            error_message = shop_settings.SHOP_ERROR_CATEGORY_EXISTS
             await client.send_message(message.channel, error_message)
             session.close()
             return
@@ -277,5 +277,38 @@ async def admin_remove_item(client, message, category_code, item_code):
 
     success_message = shop_settings.ADMIN_REMOVE_ITEM_SUCCESS.format(
         name=item_name, category_name=category_name)
+
+    await client.send_message(message.channel, success_message)
+
+
+@base_helpers.collate_args(3)
+async def admin_add_category(client, message, category_code, color,
+                             thumbnail_url, display_name):
+    # Validate arguments
+    error = base_helpers.validate_is_hex(color, 6)
+
+    if error is not None:
+        await client.send_message(message.channel, error)
+        return
+
+    # Check that category code does not already exist
+    session = main_db.create_session()
+
+    category = shop_models.get_shop_category(
+        session, category_code=category_code)
+
+    if category is not None:
+        await client.send_message(
+            message.channel, shop_settings.SHOP_ERROR_CATEGORY_EXISTS)
+        return
+
+    shop_models.create_shop_category(session, display_name, category_code,
+                                     color[2:], thumbnail_url)
+
+    session.commit()
+    session.close()
+
+    success_message = shop_settings.ADMIN_ADD_CATEGORY_SUCCESS.format(
+        name=display_name)
 
     await client.send_message(message.channel, success_message)

@@ -4,6 +4,7 @@ TRANSACTION_DB_STATUS_COMPLETE = "COMPLETE"
 
 # Validation config
 SHOP_ERROR_NO_SUCH_CATEGORY = "Error: There is no category with that name."
+SHOP_ERROR_CATEGORY_EXISTS = "Error: A category with that code already exists"
 
 # Shop embed config
 SHOP_DISPLAY_EACH_ITEM_NAME = "{stock} x {name} [id: {code_name}]"
@@ -31,8 +32,6 @@ ADMIN_UPDATE_CATEGORY_ERROR_INVALID_TYPE = (
     "'THUMBNAIL_URL', 'NAME' or 'COLOR'.")
 ADMIN_UPDATE_CATEGORY_SPACES_NOT_ALLOWED = ("Error: This update type should "
                                             "not have spaces in its values")
-ADMIN_UPDATE_CATEGORY_CODE_EXISTS = ("Error: A category with that code "
-                                     "already exists")
 ADMIN_UPDATE_CATEGORY_SUCCESS = "Updated {update_type} to {update_value}."
 
 # Admin add item config
@@ -45,3 +44,6 @@ ADMIN_REMOVE_ITEM_ERROR_ITEM_DOES_NOT_EXIST = "Error: The item does not exist."
 ADMIN_REMOVE_ITEM_ERROR_ITEM_HAS_PENDING_TRANSACTION = \
     "Error: The item still has pending transactions"
 ADMIN_REMOVE_ITEM_SUCCESS = "Removed {name} from {category_name}."
+
+# Admin add category config
+ADMIN_ADD_CATEGORY_SUCCESS = "Added {name} category."

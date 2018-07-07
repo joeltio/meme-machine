@@ -231,6 +231,8 @@ def create_shop_item(session, category_id, name, cost, stock, commit=False):
     :type cost: int.
     :param stock: How many items there are in the shop
     :type stock: int.
+    :param commit: Whether to commit after creating the shop item record.
+    :type commit: bool.
     :returns: object -- The database ShopItem model created/to be created
     (Depending on whether it was committed).
     """
@@ -248,3 +250,41 @@ def create_shop_item(session, category_id, name, cost, stock, commit=False):
         session.commit()
 
     return shop_item
+
+
+def create_shop_category(session, display_name, code_name,
+                         color, thumbnail_url, commit=False):
+    """Creates a new shop item category record.
+
+    :param session: The sqlalchemy session to use to create the shop item
+    category
+    :type session: sqlalchemy session.
+    :param display_name: The category's display name
+    :type display_name: str.
+    :param code_name: Thte category's code name used to refer to the category
+    :type code_name: str.
+    :param color: The color of the embed when showing the items in the category
+    as a 6 digit hex string (e.g. F10D2E).
+    :type color: str.
+    :param thumbnail_url: The thumbnail's url shown when showing items in the
+    category
+    :type thumbnail_url: str.
+    :param commit: Whether to commit after creating the shop item category
+    record.
+    :type commit: bool.
+    :returns: object -- The database ShopItemCategory model created/to be
+    created (Depending on whether it was committed).
+    """
+    shop_category = ShopItemCategory(
+        display_name=display_name,
+        code_name=code_name,
+        color=color,
+        thumbnail_url=thumbnail_url
+    )
+
+    session.add(shop_category)
+
+    if commit:
+        session.commit()
+
+    return shop_category
