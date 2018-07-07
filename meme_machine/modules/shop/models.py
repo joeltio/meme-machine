@@ -3,8 +3,6 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from modules.base.models import User
 
-import modules.shop.helpers as shop_helpers
-
 Base = declarative_base()
 
 
@@ -37,6 +35,16 @@ class Transaction(Base):
     initiator_user_id = Column(Integer, ForeignKey(User.id), nullable=False)
     item_id = Column(Integer, ForeignKey(ShopItem.id), nullable=False)
     status = Column(Integer, nullable=False)
+
+
+def to_code_name(item_name):
+    """Converts an item name to a code name
+
+    :param item_name: The name of the item
+    :type item_name: str.
+    :returns: str -- The code name of the item
+    """
+    return item_name.lower().replace(" ", "_")
 
 
 def get_shop_items(session, category_code=None, category_id=None):
@@ -157,8 +165,7 @@ def get_shop_item(session, id=None, category_code=None, category_id=None,
 def create_shop_item(session, category_id, name, cost, stock, commit=False):
     """Creates a new shop item record within the category. It is assumed that
     the `category_id` already exists.
-    The code name of the shop item will be set using
-    `shop.helpers.to_code_name`.
+    The code name of the shop item will be set using `to_code_name`.
 
     :param session: The sqlalchemy session to use to create the shop item
     :type session: sqlalchemy session.
@@ -176,7 +183,7 @@ def create_shop_item(session, category_id, name, cost, stock, commit=False):
     shop_item = ShopItem(
         category_id=category_id,
         name=name,
-        code_name=shop_helpers.to_code_name(name),
+        code_name=to_code_name(name),
         cost=cost,
         stock=stock
     )

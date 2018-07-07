@@ -32,13 +32,3 @@ def get_and_organize_items(session):
         organized_items[cat_id] = organized_items.get(cat_id, []) + [item]
 
     return organized_items
-
-
-def to_code_name(item_name):
-    """Converts an item name to a code name
-
-    :param item_name: The name of the item
-    :type item_name: str.
-    :returns: str -- The code name of the item
-    """
-    return item_name.lower().replace(" ", "_")
