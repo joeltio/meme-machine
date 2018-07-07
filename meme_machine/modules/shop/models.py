@@ -37,7 +37,10 @@ class Transaction(Base):
     id = Column(Integer, primary_key=True)
     initiator_user_id = Column(Integer, ForeignKey(User.id), nullable=False)
     item_id = Column(Integer, ForeignKey(ShopItem.id), nullable=False)
+    amount = Column(Integer, nullable=False)
     status = Column(Integer, nullable=False)
+    # Constraints
+    __tableargs__ = (CheckConstraint("amount > 0"),)
 
 
 def to_code_name(item_name):
