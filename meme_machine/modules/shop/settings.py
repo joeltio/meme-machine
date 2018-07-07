@@ -47,3 +47,10 @@ ADMIN_REMOVE_ITEM_SUCCESS = "Removed {name} from {category_name}."
 
 # Admin add category config
 ADMIN_ADD_CATEGORY_SUCCESS = "Added {name} category."
+
+# Admin remove category config
+ADMIN_REMOVE_CATEGORY_ERROR_CATEGORY_DOES_NOT_EXIST = \
+    "Error: The category does not exist."
+ADMIN_REMOVE_CATEGORY_ERROR_CATEGORY_HAS_ITEMS = ("Error: The category still "
+                                                  "has items in it.")
+ADMIN_REMOVE_CATEGORY_SUCCESS = "Removed {name} category."
