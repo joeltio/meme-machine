@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, ForeignKey, CheckConstraint, String
+from sqlalchemy import (Column, Integer, String, ForeignKey, CheckConstraint,
+                        UniqueConstraint)
 from sqlalchemy.ext.declarative import declarative_base
 
 from modules.base.models import User
@@ -26,7 +27,9 @@ class ShopItem(Base):
     stock = Column(Integer, nullable=False)
     # Constraints
     __tableargs__ = (CheckConstraint("cost > 0"),
-                     CheckConstraint("stock >= 0"))
+                     CheckConstraint("stock >= 0"),
+                     UniqueConstraint("category_id", "code_name",
+                                      name="uq_category_id_code_name"))
 
 
 class Transaction(Base):
@@ -116,13 +119,14 @@ def get_shop_category(session, id=None, category_code=None):
 
 
 def get_shop_item(session, id=None, category_code=None, category_id=None,
-                  item_code=None):
+                  item_code=None, item_name=None):
     """Retrieves the database ShopItem model using one of the following:
     ```
     (id)
     (category_code, item_code)
     (category_id, item_code)
     ```
+    `item_name` will be converted to `item_code`.
 
     :param session: The sqlalchemy session to use to get the shop item
     :type session: sqlalchemy session.
@@ -134,13 +138,20 @@ def get_shop_item(session, id=None, category_code=None, category_id=None,
     :type category_id: int.
     :param item_code: The shop item's code
     :type item_code: str.
+    :param item_name: The shop item's name that will be converted to
+    `item_code` before searching.
+    :type item_name: str.
     :returns: object|None -- The database ShopItem model if found, None if
     there is no such record.
     """
+    if item_name is not None and item_code is None:
+        # Convert to item code if only the item name is given
+        item_code = to_code_name(item_name)
+
     if id is not None:
         # Only id
         filters = {"id": id}
-    elif (category_code or item_code) is not None:
+    elif (category_code and item_code) is not None:
         # Category and item code
         category = get_shop_category(session, category_code=category_code)
 
@@ -148,9 +159,9 @@ def get_shop_item(session, id=None, category_code=None, category_id=None,
             return None
 
         filters = {"code_name": item_code, "category_id": category.id}
-    elif (category_id or item_code) is not None:
+    elif (category_id and item_code) is not None:
         # Category id and item code
-        filters = {"code_name": item_code, "category_id": category.id}
+        filters = {"code_name": item_code, "category_id": category_id}
     else:
         return None
 
