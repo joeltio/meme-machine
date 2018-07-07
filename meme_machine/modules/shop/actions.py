@@ -3,7 +3,9 @@ import discord
 import database as main_db
 
 import modules.base.helpers as base_helpers
+import modules.base.models as base_models
 
+import modules.credits.models as credit_models
 import modules.credits.helpers as credit_helpers
 
 import modules.shop.settings as shop_settings
@@ -250,7 +252,7 @@ async def admin_remove_item(client, message, category_code, item_code):
     if shop_item is None:
         await client.send_message(
             message.channel,
-            shop_settings.ADMIN_REMOVE_ITEM_ERROR_ITEM_DOES_NOT_EXIST)
+            shop_settings.SHOP_ERROR_ITEM_DOES_NOT_EXIST)
         session.close()
         return
 
@@ -327,7 +329,7 @@ async def admin_remove_category(client, message, category_code):
     if category is None:
         await client.send_message(
             message.channel,
-            shop_settings.ADMIN_REMOVE_CATEGORY_ERROR_CATEGORY_DOES_NOT_EXIST)
+            shop_settings.SHOP_ERROR_CATEGORY_DOES_NOT_EXIST)
         session.close()
         return
 
@@ -351,3 +353,80 @@ async def admin_remove_category(client, message, category_code):
         name=category_name)
 
     await client.send_message(message.channel, success_message)
+
+
+@base_helpers.limit_command_arg(3)
+async def buy(client, message, category_code, item_code, str_amount):
+    # Validate arguments
+    error = base_helpers.validate_is_int(str_amount, True)
+
+    if error is not None:
+        await client.send_message(message.channel, error)
+        return
+
+    amount = int(str_amount)
+
+    # Check that the category exists
+    session = main_db.create_session()
+
+    category = shop_models.get_shop_category(
+        session, category_code=category_code)
+
+    if category is None:
+        await client.send_message(
+            message.channel,
+            shop_settings.SHOP_ERROR_CATEGORY_DOES_NOT_EXIST)
+        session.close()
+        return
+
+    # Check that the item exists in the category
+    shop_item = shop_models.get_shop_item(session, category_id=category.id,
+                                          item_code=item_code)
+
+    if shop_item is None:
+        await client.send_message(
+            message.channel,
+            shop_settings.SHOP_ERROR_ITEM_DOES_NOT_EXIST)
+        session.close()
+        return
+
+    # Check if the user has enough credits to buy the item
+    total_cost = shop_item.cost * amount
+
+    sender_discord = message.author
+    sender_user = base_models.get_or_create_user(session, sender_discord)
+    sender_credit = credit_models.get_or_create_credit(session, sender_user.id)
+
+    if sender_credit.credits < total_cost:
+        error_message = shop_settings.BUY_ERROR_INSUFFICIENT_CREDITS.format(
+            total_cost=total_cost, user_credits=sender_credit.credits)
+        await client.send_message(message.channel, error_message)
+        session.close()
+        return
+
+    # Create transaction
+    transaction = shop_models.create_transaction(
+        session, sender_user.id, shop_item.id, amount)
+
+    # Deduct amount
+    sender_credit.credits -= total_cost
+
+    session.commit()
+
+    user_identifier = sender_discord.name + "#" + sender_discord.discriminator
+
+    sender_success_message = shop_settings.BUY_SENDER_SUCCESS.format(
+        transaction_id=transaction.id, amount=amount, item_name=shop_item.name,
+        total_cost=total_cost)
+    purchase_order_message = shop_settings.BUY_PURCHASE_ORDER_SUCCESS.format(
+        transaction_id=transaction.id, amount=amount, item_name=shop_item.name,
+        total_cost=total_cost, user_identifier=user_identifier)
+
+    session.close()
+
+    # Send to initiator
+    await client.send_message(message.channel, sender_success_message)
+    # Send purchase order
+    purchase_order_receiver = await client.get_user_info(
+        shop_settings.BUY_PURCHASE_ORDER_DESTINATION)
+    await client.send_message(purchase_order_receiver, purchase_order_message)

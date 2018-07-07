@@ -4,6 +4,8 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from modules.base.models import User
 
+import modules.shop.settings as shop_settings
+
 Base = declarative_base()
 
 
@@ -291,3 +293,34 @@ def create_shop_category(session, display_name, code_name,
         session.commit()
 
     return shop_category
+
+
+def create_transaction(session, initiator_id, item_id, amount, commit=False):
+    """Creates a transaction record with the status of pending.
+
+    :param session: The sqlalchemy session to use to create the transaction
+    :type session: sqlalchemy session.
+    :param initiator_id: The id of the user who initiated the transaction
+    :type initiator_id: int.
+    :param item_id: The id of the item to be transferred after the transaction
+    :type item_id: int.
+    :param amount: The amount of items to be transferred after the transaction
+    :type amount: int.
+    :param commit: Whether to commit after creating the transaction record.
+    :type commit: bool.
+    :returns: object -- The database Transaction model created/to be
+    created (Depending on whether it was committed).
+    """
+    transaction = Transaction(
+        initiator_user_id=initiator_id,
+        item_id=item_id,
+        amount=amount,
+        status=shop_settings.TRANSACTION_DB_STATUS_PENDING,
+    )
+
+    session.add(transaction)
+
+    if commit:
+        session.commit()
+
+    return transaction

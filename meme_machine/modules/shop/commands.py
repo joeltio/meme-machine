@@ -1,7 +1,7 @@
 from modules.shop.actions import (shop, shops, admin_shop, admin_set_stock,
                                   admin_update_category, admin_add_item,
                                   admin_remove_item, admin_add_category,
-                                  admin_remove_category)
+                                  admin_remove_category, buy)
 
 COMMANDS = {
     "shop": shop,
@@ -13,4 +13,5 @@ COMMANDS = {
     "admin-remove-item": admin_remove_item,
     "admin-add-category": admin_add_category,
     "admin-remove-category": admin_remove_category,
+    "buy": buy
 }
