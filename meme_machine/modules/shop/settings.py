@@ -58,6 +58,7 @@ ADMIN_REMOVE_CATEGORY_SUCCESS = "Removed {name} category."
 # Buy config
 # User id of who receives the purchase order
 BUY_PURCHASE_ORDER_DESTINATION = "330241589211299850"
+BUY_ERROR_AMOUNT_ZERO = "Error: You cannot buy 0 items."
 BUY_ERROR_INSUFFICIENT_CREDITS = ("Error: You do not have enough credits "
                                   "(Required: {total_cost}, Owned: "
                                   "{user_credits})")

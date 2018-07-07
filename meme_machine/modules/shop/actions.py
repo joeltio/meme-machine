@@ -366,6 +366,12 @@ async def buy(client, message, category_code, item_code, str_amount):
 
     amount = int(str_amount)
 
+    # Check that the amount is more than 0
+    if amount == 0:
+        await client.send_message(
+            message.channel, shop_settings.BUY_ERROR_AMOUNT_ZERO)
+        return
+
     # Check that the category exists
     session = main_db.create_session()
 
