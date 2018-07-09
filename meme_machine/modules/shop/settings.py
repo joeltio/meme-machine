@@ -82,7 +82,10 @@ ADMIN_TRANS_ERROR_STATUS_ALREADY_SET = \
 ADMIN_TRANS_SUCCESS_INITIATOR = ("Your transaction for {amount}x{item_name} "
                                  "[id: {transaction_id}] has been processed! "
                                  "Check your Steam trades!")
+ADMIN_TRANS_FAILED_INITIATOR = ("Your transaction for {amount}x{item_name} "
+                                "[id: {transaction_id}] failed. "
+                                "{total_cost}PP has been refunded.")
 ADMIN_TRANS_SUCCESS = ("The transaction for {amount}x{item_name} [id: "
                        "{transaction_id}] has been set to SUCCESS.")
 ADMIN_TRANS_FAILED = ("The transaction for {amount}x{item_name} [id: "
-                       "{transaction_id}] has been set to FAILED.")
+                      "{transaction_id}] has been set to FAILED.")
