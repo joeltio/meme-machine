@@ -72,3 +72,17 @@ BUY_PURCHASE_ORDER_SUCCESS = ("Pending Transaction\n"
                               "User: {user_identifier}\n"
                               "PP Spent: {total_cost}\n"
                               "Item: {amount}x{item_name}")
+
+# Transaction config
+ADMIN_TRANS_ERROR_DOES_NOT_EXIST = ("Error: The transaction with that id does "
+                                    "not exist.")
+ADMIN_TRANS_ERROR_STATUS_ALREADY_SET = \
+    ("Error: The status for the transaction has already been set to "
+     "{current_status}")
+ADMIN_TRANS_SUCCESS_INITIATOR = ("Your transaction for {amount}x{item_name} "
+                                 "[id: {transaction_id}] has been processed! "
+                                 "Check your Steam trades!")
+ADMIN_TRANS_SUCCESS = ("The transaction for {amount}x{item_name} [id: "
+                       "{transaction_id}] has been set to SUCCESS.")
+ADMIN_TRANS_FAILED = ("The transaction for {amount}x{item_name} [id: "
+                       "{transaction_id}] has been set to FAILED.")

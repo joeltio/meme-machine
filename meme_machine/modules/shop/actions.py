@@ -436,3 +436,61 @@ async def buy(client, message, category_code, item_code, str_amount):
     purchase_order_receiver = await client.get_user_info(
         shop_settings.BUY_PURCHASE_ORDER_DESTINATION)
     await client.send_message(purchase_order_receiver, purchase_order_message)
+
+
+@base_helpers.limit_command_arg(1)
+async def admin_trans_success(client, message, transaction_id):
+    # Validate argument
+    error = base_helpers.validate_is_int(transaction_id, True)
+
+    if error is not None:
+        await client.send_message(message.channel, error)
+        return
+
+    # Check that the transaction exists
+    session = main_db.create_session()
+    transaction = shop_models.get_transaction(session, transaction_id)
+
+    if transaction is None:
+        await client.send_message(
+            message.channel,
+            shop_settings.ADMIN_TRANS_ERROR_DOES_NOT_EXIST)
+        session.close()
+        return
+
+    # Check that the transaction is still pending
+    if transaction.status != shop_settings.TRANSACTION_DB_STATUS_PENDING:
+        error_message = shop_settings.ADMIN_TRANS_ERROR_STATUS_ALREADY_SET \
+            .format(current_status=transaction.status)
+        await client.send_message(message.channel, error_message)
+        session.close()
+        return
+
+    # Set the transaction status
+    transaction.status = shop_settings.TRANSACTION_DB_STATUS_SUCCESS
+
+    # Get the user initiator's discord user
+    initiator_user = base_models.get_user(
+        session, id=transaction.initiator_user_id)
+    initiator_discord = await client.get_user_info(initiator_user.snowflake)
+
+    # Get the item in the transaction
+    shop_item = shop_models.get_shop_item(session, id=transaction.item_id)
+
+    shop_item_name = shop_item.name
+    amount = transaction.amount
+    transaction_id = transaction.id
+
+    session.commit()
+    session.close()
+
+    # Send the confirmation to the user
+    confirm_message = shop_settings.ADMIN_TRANS_SUCCESS_INITIATOR.format(
+        item_name=shop_item_name, amount=amount,
+        transaction_id=transaction_id)
+    await client.send_message(initiator_discord, confirm_message)
+
+    success_message = shop_settings.ADMIN_TRANS_SUCCESS.format(
+        item_name=shop_item_name, amount=amount,
+        transaction_id=transaction_id)
+    await client.send_message(message.channel, success_message)

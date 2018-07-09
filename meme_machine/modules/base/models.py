@@ -65,18 +65,24 @@ def create_user(session, discord_user, commit=False):
     return new_user
 
 
-def get_user(session, discord_snowflake):
-    """Gets the user based on the discord snowflake.
+def get_user(session, discord_snowflake=None, id=None):
+    """Gets the user based on the discord snowflake or the user record id.
 
     :param session: The sqlalchemy session to use to create the user
     :type session: sqlalchemy session.
     :param discord_snowflake: The discord snowflake to identify the user
     :type discord_snowflake: str.
+    :param id: The user record id.
+    :type: int.
     :returns: object|None -- The database User model if found, None if no user
     was found
 
     """
-    query = session.query(User).filter_by(snowflake=discord_snowflake).all()
+    if discord_snowflake is None:
+        query = session.query(User).filter_by(id=id).all()
+    else:
+        query = session.query(User).filter_by(
+            snowflake=discord_snowflake).all()
 
     if query:
         return query[0]
@@ -96,7 +102,7 @@ def get_or_create_user(session, discord_user):
     :returns: object -- The database User model of the fetched/created user
 
     """
-    query = get_user(session, discord_user.id)
+    query = get_user(session, discord_snowflake=discord_user.id)
     if query:
         return query
     else:
