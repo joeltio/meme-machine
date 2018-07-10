@@ -19,5 +19,6 @@ class Raffle(Base):
     id = Column(Integer, primary_key=True)
     max_slots = Column(Integer, nullable=False)
     item = Column(String, nullable=False)
+    status = Column(String, nullable=False)
     # Constraints
     __tableargs__ = (CheckConstraint("max_slots > 0"),)
