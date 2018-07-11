@@ -42,6 +42,33 @@ def get_current_raffle(session):
     return query
 
 
+def get_raffle_slots(session, raffle_id):
+    """Retrieves the raffle slots for the raffle id
+
+    :param session: The sqlalchemy session to use to get the raffle slots
+    :type session: sqlalchemy session.
+    :param raffle_id: The raffle id to filter the raffle slots by.
+    :type raffle_id: int.
+    :returns: list[object] -- A list of the database RaffleSlot model if
+    any found, an empty list if there are no open raffles or there are no
+    raffle slots.
+    """
+    return session.query(RaffleSlot).filter_by(raffle_id=raffle_id).all()
+
+
+def get_total_raffle_slots_slots(session, raffle_id):
+    """Retrieves the sum of all `slots` in every RaffleSlot record that has the
+    raffle id.
+
+    :param session: The sqlalchemy session to use to get the raffle slots
+    :type session: sqlalchemy session.
+    :param raffle_id: The raffle id to filter the raffle slots by.
+    :type raffle_id: int.
+    :returns: int -- The total number of raffle slots slots.
+    """
+    raise NotImplementedError("FIXME")
+
+
 def create_raffle(session, item_name, max_slots, commit=False):
     """Creates a new raffle record with the item name and max slots. The new
     raffle record will have the status of OPEN.
