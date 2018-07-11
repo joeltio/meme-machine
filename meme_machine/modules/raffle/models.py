@@ -8,14 +8,6 @@ import modules.raffle.settings as raffle_settings
 Base = declarative_base()
 
 
-class RaffleSlot(Base):
-    __tablename__ = "raffle_slot"
-    user_id = Column(Integer, ForeignKey(User.id), primary_key=True)
-    slots = Column(Integer, nullable=False)
-    # Constraints
-    __tableargs__ = (CheckConstraint("slots > 0"),)
-
-
 class Raffle(Base):
     __tablename__ = "raffle"
     id = Column(Integer, primary_key=True)
@@ -24,6 +16,16 @@ class Raffle(Base):
     status = Column(String, nullable=False)
     # Constraints
     __tableargs__ = (CheckConstraint("max_slots > 0"),)
+
+
+class RaffleSlot(Base):
+    __tablename__ = "raffle_slot"
+    id = Column(Integer, primary_key=True)
+    raffle_id = Column(Integer, ForeignKey(Raffle.id), nullable=False)
+    user_id = Column(Integer, ForeignKey(User.id), nullable=False)
+    slots = Column(Integer, nullable=False)
+    # Constraints
+    __tableargs__ = (CheckConstraint("slots > 0"),)
 
 
 def get_current_raffle(session):
