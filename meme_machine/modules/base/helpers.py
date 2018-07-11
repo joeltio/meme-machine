@@ -161,3 +161,13 @@ def validate_is_hex(val, digits):
             return None
         except ValueError:
             return base_settings.HEX_ERROR_NOT_VALID.format(digits=digits)
+
+
+def get_identifier(discord_user):
+    """Returns the commonly used identifier of SomeName#0000.
+
+    :params discord_user: The discord user
+    :type discord_user: discord.py user object
+    :returns: The discourd user identifier.
+    """
+    return discord_user.name + "#" + discord_user.discriminator

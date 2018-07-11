@@ -419,7 +419,7 @@ async def buy(client, message, category_code, item_code, str_amount):
 
     session.commit()
 
-    user_identifier = sender_discord.name + "#" + sender_discord.discriminator
+    user_identifier = base_helpers.get_identifier(sender_discord)
 
     sender_success_message = shop_settings.BUY_SENDER_SUCCESS.format(
         transaction_id=transaction.id, amount=amount, item_name=shop_item.name,
