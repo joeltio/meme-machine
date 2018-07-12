@@ -11,5 +11,6 @@ ADMIN_START_RAFFLE_SUCCESS = ("The raffle for {item_name} with {max_slots} "
 ADMIN_END_RAFFLE_ERROR_NO_RAFFLE_ONGOING = "Error: There is no ongoing raffle."
 ADMIN_END_RAFFLE_NO_WINNER_NAME = "There is no winner."
 ADMIN_END_RAFFLE_SUCCESS = ("The raffle for {item_name} with {max_slots} max "
-                            "slots has been closed. The winner is: {winner}")
+                            "slots has been closed. The winner is: "
+                            "{winner_name}")
 ADMIN_END_RAFFLE_PM = "You have won the raffle for {item_name}!"
