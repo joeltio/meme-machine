@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, CheckConstraint
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.sql import func
 
 from modules.base.models import User
 
@@ -66,7 +67,13 @@ def get_total_raffle_slots_slots(session, raffle_id):
     :type raffle_id: int.
     :returns: int -- The total number of raffle slots slots.
     """
-    raise NotImplementedError("FIXME")
+    query = session.query(func.sum(RaffleSlot.slots)) \
+        .filter_by(raffle_id=raffle_id).first()
+
+    if query[0] is None:
+        return 0
+    else:
+        return query[0]
 
 
 def create_raffle(session, item_name, max_slots, commit=False):
