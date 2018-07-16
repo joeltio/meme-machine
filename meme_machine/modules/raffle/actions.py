@@ -141,3 +141,26 @@ async def buy_slots(client, message, str_num_slots):
     success_message = raffle_settings.BUY_SLOTS_SUCCESS.format(slots=num_slots)
 
     await client.send_message(message.channel, success_message)
+
+
+@base_helpers.limit_command_arg(0)
+async def raffle(client, message):
+    session = main_db.create_session()
+
+    current_raffle = raffle_models.get_raffle(session)
+    if current_raffle is None:
+        session.close()
+        await client.send_message(
+            message.channel, raffle_settings.RAFFLE_DISPLAY_NO_RAFFLE)
+        return
+
+    current_slots = raffle_models.get_total_raffle_slots_slots(
+        session, current_raffle.id)
+
+    display_message = raffle_settings.RAFFLE_DISPLAY.format(
+        raffle_item=current_raffle.item, current_slots=current_slots,
+        max_slots=current_raffle.max_slots)
+
+    session.close()
+
+    await client.send_message(message.channel, display_message)
