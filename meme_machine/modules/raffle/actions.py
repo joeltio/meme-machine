@@ -3,6 +3,8 @@ import database as main_db
 import modules.base.models as base_models
 import modules.base.helpers as base_helpers
 
+import modules.credits.models as credit_models
+
 import modules.raffle.models as raffle_models
 import modules.raffle.settings as raffle_settings
 import modules.raffle.helpers as raffle_helpers
@@ -21,7 +23,7 @@ async def admin_start_raffle(client, message, item_name, str_max_slots):
 
     # Check if there is an ongoing raffle
     session = main_db.create_session()
-    current_raffle = raffle_models.get_current_raffle(session)
+    current_raffle = raffle_models.get_raffle(session)
 
     if current_raffle is not None:
         await client.send_message(
@@ -45,7 +47,7 @@ async def admin_start_raffle(client, message, item_name, str_max_slots):
 async def admin_end_raffle(client, message):
     # Check if there is an ongoing raffle
     session = main_db.create_session()
-    current_raffle = raffle_models.get_current_raffle(session)
+    current_raffle = raffle_models.get_raffle(session)
 
     if current_raffle is None:
         await client.send_message(
@@ -87,3 +89,55 @@ async def admin_end_raffle(client, message):
 
     await client.send_message(message.channel, success_message)
     await client.send_message(winner_discord, pm_message)
+
+
+@base_helpers.limit_command_arg(1)
+async def buy_slots(client, message, str_num_slots):
+    # Validate argument
+    error = base_helpers.validate_is_int(str_num_slots, True)
+
+    if error is not None:
+        await client.send_message(message.channel, error)
+        return
+
+    num_slots = int(str_num_slots)
+
+    # Get the user and their credit
+    session = main_db.create_session()
+    sender_discord = message.author
+    sender_user = base_models.get_or_create_user(session, sender_discord)
+    sender_credit = credit_models.get_or_create_credit(session, sender_user.id)
+
+    # Check that the user has enough money
+    total_cost = raffle_settings.RAFFLE_SLOT_COST * num_slots
+
+    if total_cost > sender_credit.credits:
+        error_message = raffle_settings.BUY_SLOTS_ERROR_INSUFFICIENT_CREDITS \
+            .format(total_cost=total_cost, user_credits=sender_credit.credits)
+        session.close()
+        await client.send_message(message.channel, error_message)
+        return
+
+    # Check that there are enough slots up for sale
+    current_raffle = raffle_models.get_raffle(session)
+    taken_slots = raffle_models.get_total_raffle_slots_slots(
+        session, current_raffle.id)
+    slots_left = current_raffle.max_slots - taken_slots
+
+    if slots_left < num_slots:
+        error_message = raffle_settings.BUY_SLOTS_ERROR_TOO_MANY_SLOTS.format(
+            slots_left=slots_left)
+        session.close()
+        await client.send_message(message.channel, error_message)
+        return
+
+    # Buy the slots
+    sender_credit.credits -= total_cost
+    raffle_models.create_raffle_slot(session, sender_user.id, num_slots)
+
+    session.commit()
+    session.close()
+
+    success_message = raffle_settings.BUY_SLOTS_SUCCESS.format(slots=num_slots)
+
+    await client.send_message(message.channel, success_message)
