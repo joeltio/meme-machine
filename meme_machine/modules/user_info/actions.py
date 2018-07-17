@@ -52,3 +52,29 @@ async def profile(client, message):
 
     profile_message += user_info_settings.PROFILE_DISPLAY_FOOTER
     await client.send_message(message.channel, profile_message)
+
+
+@base_helpers.limit_command_arg(1)
+async def set_steam_profile(client, message, steam_profile_url):
+    # Validate steam profile url
+    if not steam_profile_url.startswith("https://steamcommunity.com/id/"):
+        await client.send_message(
+            message.channel,
+            user_info_settings.SET_STEAM_PROFILE_ERROR_INVALID)
+        return
+
+    session = maindb.create_session()
+
+    # Get the user
+    sender_discord = message.author
+    sender_user = base_models.get_or_create_user(session, sender_discord)
+
+    user_info_models.set_steam_profile(
+        session, sender_user.id, steam_profile_url)
+
+    session.commit()
+    session.close()
+
+    success_message = user_info_settings.SET_STEAM_PROFILE_SUCCESS.format(
+        new_profile_url=steam_profile_url)
+    await client.send_message(message.channel, success_message)

@@ -10,3 +10,9 @@ PROFILE_DISPLAY_FOOTER = "--------------------------------"
 
 PROFILE_DISPLAY_NO_CURRENT_RAFFLES = "Raffle: There are currently no raffles"
 PROFILE_DISPLAY_NO_STEAM_URL = "Steam URL: You have not set your steam url"
+
+# Set steam profile url conifg
+SET_STEAM_PROFILE_ERROR_INVALID = ("Error: The url must start with "
+                                   "https://steamcommunity.com/id/")
+SET_STEAM_PROFILE_SUCCESS = ("Your steam profile url has been updated to "
+                             "{new_profile_url}")

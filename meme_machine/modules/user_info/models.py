@@ -29,3 +29,45 @@ def get_steam_profile(session, user_id):
         name=user_info_settings.USER_INFO_DB_NAME_STEAM_URL).first()
 
     return query and query.value
+
+
+def create_steam_profile(session, user_id, url):
+    """Creates a new steam profile url record for the user.
+
+    :param session: The sqlalchemy session to use to get the steam profile url
+    :type session: sqlalchemy session.
+    :param user_id: The id of the user to create the steam profile url
+    :type user_id: int.
+    :param url: The steam profile url
+    :type url: str.
+    :returns: None
+    """
+    user_info = UserInfo(
+        user_id=user_id,
+        name=user_info_settings.USER_INFO_DB_NAME_STEAM_URL,
+        value=url
+    )
+
+    session.add(user_info)
+
+
+def set_steam_profile(session, user_id, url):
+    """Sets the steam profile url for the user. If the user did not have a
+    steam profile url before, this function will create one.
+
+    :param session: The sqlalchemy session to use to get the steam profile url
+    :type session: sqlalchemy session.
+    :param user_id: The id of the user to set the steam profile url
+    :type user_id: int.
+    :param url: The steam profile url
+    :type url: str.
+    :returns: None
+    """
+    user_info = session.query(UserInfo).filter_by(
+        user_id=user_id,
+        name=user_info_settings.USER_INFO_DB_NAME_STEAM_URL).first()
+
+    if user_info is None:
+        create_steam_profile(session, user_id, url)
+    else:
+        user_info.value = url
