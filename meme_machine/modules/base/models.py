@@ -11,7 +11,6 @@ class User(Base):
     snowflake = Column(String, nullable=False, unique=True)
     username = Column(String, nullable=False)
     discriminator = Column(String, nullable=False)
-    steam_profile_url = Column(String)
     # Constraints
     __tableargs__ = (UniqueConstraint("username", "discriminator"),)
 
