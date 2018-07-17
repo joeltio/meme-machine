@@ -49,6 +49,32 @@ def get_raffle(session, raffle_id=None):
     return query
 
 
+def get_raffle_slot(session, user_id, raffle_id=None):
+    """Retrieves the raffle slot filtered by user id and raffle id.
+    If raffle id is None, the current raffle will be used
+
+    :param session: The sqlalchemy session to use to get the raffle slot
+    :type session: sqlalchemy session.
+    :param user_id: The id of the user to whom the raffle slot belongs to
+    :type user_id: int.
+    :param raffle_id: The raffle id
+    :type raffle_id: int.
+    :returns: object|None The database RaffleSlot model if any found, None if
+    there are no RaffleSlots matching the filters or if there are no open
+    raffles (for when raffle_id is None).
+    """
+    if raffle_id is None:
+        current_raffle = get_raffle(session)
+
+        if current_raffle is None:
+            return
+
+        raffle_id = current_raffle.id
+
+    return session.query(RaffleSlot).filter_by(
+        raffle_id=raffle_id, user_id=user_id).first()
+
+
 def get_raffle_slots(session, raffle_id):
     """Retrieves the raffle slots for the raffle id
 
