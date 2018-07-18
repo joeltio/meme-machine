@@ -417,6 +417,9 @@ async def buy(client, message, category_code, item_code, str_amount):
     # Deduct amount
     sender_credit.credits -= total_cost
 
+    # Decrease stock
+    shop_item.stock -= amount
+
     session.commit()
 
     user_identifier = base_helpers.get_identifier(sender_discord)
@@ -544,6 +547,9 @@ async def admin_trans_fail(client, message, transaction_id):
     # Refund the credits
     initiator_credit = credit_models.get_credit(session, initiator_user.id)
     initiator_credit.credits += total_cost
+
+    # Add back the stock
+    shop_item.stock += amount
 
     session.commit()
     session.close()
