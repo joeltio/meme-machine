@@ -26,10 +26,10 @@ DAILY_CONFIG_MIN_DEFAULT = 5
 DAILY_CONFIG_MAX_DEFAULT = 15
 
 # Daily command messages
-DAILY_SECONDS_LEFT = "You have to wait {seconds} more seconds."
-DAILY_MINUTES_LEFT = "You have to wait {minutes} more minutes."
-DAILY_HOURS_AND_MINUTES_LEFT = ("You have to wait {hours} hours and {minutes} "
-                                "more minutes.")
+DAILY_SECONDS_LEFT = "You have to wait {seconds} more second(s)."
+DAILY_MINUTES_LEFT = "You have to wait {minutes} more minute(s)."
+DAILY_HOURS_AND_MINUTES_LEFT = ("You have to wait {hours} hour(s) and "
+                                "{minutes} more minute(s).")
 DAILY_SUCCESS = "{mention} has just gotten {amount}PP!"
 
 ADMIN_DAILY_AMT_SUCCESS = ("Successfully updated daily range to "
