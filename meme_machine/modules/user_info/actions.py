@@ -1,7 +1,10 @@
+import discord
+
 import database as maindb
 
 import modules.base.models as base_models
 import modules.base.helpers as base_helpers
+import modules.base.settings as base_settings
 
 import modules.credits.models as credit_models
 
@@ -13,18 +16,29 @@ import modules.user_info.settings as user_info_settings
 
 @base_helpers.limit_command_arg(0)
 async def profile(client, message):
-    profile_message = user_info_settings.PROFILE_DISPLAY_HEADER + "\n"
-
     session = maindb.create_session()
 
     # User
     sender_discord = message.author
     sender_user = base_models.get_or_create_user(session, sender_discord)
 
+    embed = discord.Embed(
+        title=sender_discord.name,
+        color=user_info_settings.PROFILE_DISPLAY_COLOR)
+    embed.set_author(name=user_info_settings.PROFILE_DISPLAY_TITLE,
+                     icon_url=base_settings.EMBED_AUTHOR_ICON)
+    embed.set_thumbnail(
+        url=sender_discord.avatar_url or sender_discord.default_avatar_url)
+
     # Credits
     sender_credit = credit_models.get_or_create_credit(session, sender_user.id)
-    profile_message += user_info_settings.PROFILE_DISPLAY_CREDIT.format(
-        credits=sender_credit.credits) + "\n"
+
+    # Add the credits field to the embed
+    embed_credit_value = user_info_settings.PROFILE_DISPLAY_CREDIT_VALUE \
+        .format(credits=sender_credit.credits)
+    embed.add_field(
+        name=user_info_settings.PROFILE_DISPLAY_CREDIT_NAME,
+        value=embed_credit_value, inline=False)
 
     # Raffles
     current_raffle = raffle_models.get_raffle(session)
@@ -34,24 +48,32 @@ async def profile(client, message):
 
         sender_num_slots = sender_raffle_slots.slots or 0
 
-        profile_message += user_info_settings.PROFILE_DISPLAY_RAFFLE.format(
-            user_slots=sender_num_slots, max_slots=current_raffle.max_slots)
-        profile_message += "\n"
+        embed_raffle_value = user_info_settings.PROFILE_DISPLAY_RAFFLE_VALUE \
+            .format(user_slots=sender_num_slots,
+                    max_slots=current_raffle.max_slots)
     else:
         # No current raffle
-        profile_message += \
-            user_info_settings.PROFILE_DISPLAY_NO_CURRENT_RAFFLES + "\n"
+        embed_raffle_value = \
+            user_info_settings.PROFILE_DISPLAY_NO_CURRENT_RAFFLES
+
+    embed.add_field(
+        name=user_info_settings.PROFILE_DISPLAY_RAFFLE_NAME,
+        value=embed_raffle_value, inline=False)
 
     # Steam Profile Url
     steam_url = user_info_models.get_steam_profile(session, sender_user.id) \
         or user_info_settings.PROFILE_DISPLAY_NO_STEAM_URL
-    profile_message += user_info_settings.PROFILE_DISPLAY_STEAM_URL.format(
-        steam_url=steam_url) + "\n"
+
+    embed_steam_url_value = \
+        user_info_settings.PROFILE_DISPLAY_STEAM_URL_VALUE.format(
+            steam_url=steam_url)
+    embed.add_field(
+        name=user_info_settings.PROFILE_DISPLAY_STEAM_URL_NAME,
+        value=embed_steam_url_value, inline=False)
 
     session.close()
 
-    profile_message += user_info_settings.PROFILE_DISPLAY_FOOTER
-    await client.send_message(message.channel, profile_message)
+    await client.send_message(message.channel, embed=embed)
 
 
 @base_helpers.limit_command_arg(1)
