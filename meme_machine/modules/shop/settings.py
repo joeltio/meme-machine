@@ -14,9 +14,6 @@ SHOP_DISPLAY_EACH_ITEM_NAME = "{stock} x {name} [id: {code_name}]"
 SHOP_DISPLAY_EACH_ITEM_VALUE = "{cost}PP"
 SHOP_DISPLAY_NO_ITEMS = "No items"
 
-# General shops config
-SHOP_ALL_AUTHOR_ICON = "https://i.imgur.com/3Dh1TDW.png"
-
 # Shop embed config
 SHOP_TITLE = "Panda Points Shop - {category_code}"
 

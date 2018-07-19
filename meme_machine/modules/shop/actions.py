@@ -4,6 +4,7 @@ import database as main_db
 
 import modules.base.helpers as base_helpers
 import modules.base.models as base_models
+import modules.base.settings as base_settings
 
 import modules.credits.models as credit_models
 import modules.credits.helpers as credit_helpers
@@ -31,7 +32,7 @@ async def _shop(client, message, category_code, only_in_stock=True):
     embed = discord.Embed(title=category.display_name,
                           color=int(category.color, 16))
     embed.set_author(name=author_name,
-                     icon_url=shop_settings.SHOP_ALL_AUTHOR_ICON)
+                     icon_url=base_settings.EMBED_AUTHOR_ICON)
     embed.set_thumbnail(url=category.thumbnail_url)
 
     # Create the items
@@ -70,7 +71,7 @@ async def shops(client, message):
     embed = discord.Embed(title=shop_settings.SHOPS_TITLE,
                           color=shop_settings.SHOPS_COLOR)
     embed.set_author(name=shop_settings.SHOPS_TITLE,
-                     icon_url=shop_settings.SHOP_ALL_AUTHOR_ICON)
+                     icon_url=base_settings.EMBED_AUTHOR_ICON)
 
     session = main_db.create_session()
 

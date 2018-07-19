@@ -13,3 +13,6 @@ RANGE_ERROR_START_EQ_END = ("Error: Start of the range should not be the same "
                             "as the end.")
 
 HEX_ERROR_NOT_VALID = "Error: Argument should be a {digits}-digit hexadecimal."
+
+# Embeds config
+EMBED_AUTHOR_ICON = "https://i.imgur.com/3Dh1TDW.png"
