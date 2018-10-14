@@ -89,6 +89,38 @@ def get_raffle_slots(session, raffle_id):
     return session.query(RaffleSlot).filter_by(raffle_id=raffle_id).all()
 
 
+def get_user_total_raffle_slots_slots(session, user_id, raffle_id=None):
+    """Aggregates the user's raffle slots slots.
+    In other words, returns the total slots that the user has bought for a
+    raffle.
+    If raffle id is None, the current raffle will be used
+
+    :param session: The sqlalchemy session to use to get the raffle slots
+    :type session: sqlalchemy session.
+    :param raffle_id: The raffle id the user is in.
+    :type raffle_id: int.
+    :param user_id: The id of the user to whom the raffle slots belongs to
+    :type user_id: int.
+    :returns: int|None -- The number of slots the user has for the given
+    raffle. None if no raffle id was given and there are no current raffles.
+    """
+    if raffle_id is None:
+        current_raffle = get_raffle(session)
+
+        if current_raffle is None:
+            return
+
+        raffle_id = current_raffle.id
+
+    query = session.query(func.sum(RaffleSlot.slots)).filter_by(
+        raffle_id=raffle_id, user_id=user_id).first()
+
+    if query[0] is None:
+        return 0
+    else:
+        return query[0]
+
+
 def get_total_raffle_slots_slots(session, raffle_id=None):
     """Retrieves the sum of all `slots` in every RaffleSlot record that has the
     raffle id.

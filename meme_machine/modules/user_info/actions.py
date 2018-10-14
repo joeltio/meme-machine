@@ -40,16 +40,11 @@ async def _profile(client, message, discord_user):
     # Raffles
     current_raffle = raffle_models.get_raffle(session)
     if current_raffle is not None:
-        sender_raffle_slots = raffle_models.get_raffle_slot(
+        sender_raffle_slots = raffle_models.get_user_total_raffle_slots_slots(
             session, db_user.id, current_raffle.id)
 
-        if sender_raffle_slots is None:
-            sender_num_slots = 0
-        else:
-            sender_num_slots = sender_raffle_slots.slots
-
         embed_raffle_value = user_info_settings.PROFILE_DISPLAY_RAFFLE_VALUE \
-            .format(user_slots=sender_num_slots,
+            .format(user_slots=sender_raffle_slots,
                     max_slots=current_raffle.max_slots)
     else:
         # No current raffle
