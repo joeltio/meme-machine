@@ -16,6 +16,7 @@ PROFILE_DISPLAY_NO_STEAM_URL = "You have not set your steam url"
 
 # Set steam profile url conifg
 SET_STEAM_PROFILE_ERROR_INVALID = ("Error: The url must start with "
-                                   "https://steamcommunity.com/id/")
+                                   "https://steamcommunity.com/id/ or "
+                                   "https://steamcommunity.com/profiles/")
 SET_STEAM_PROFILE_SUCCESS = ("Your steam profile url has been updated to "
                              "{new_profile_url}")

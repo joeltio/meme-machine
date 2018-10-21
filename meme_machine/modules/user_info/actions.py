@@ -12,6 +12,7 @@ import modules.raffle.models as raffle_models
 
 import modules.user_info.models as user_info_models
 import modules.user_info.settings as user_info_settings
+import modules.user_info.helpers as user_info_helpers
 
 
 async def _profile(client, message, discord_user):
@@ -80,7 +81,7 @@ async def profile(client, message):
 @base_helpers.limit_command_arg(1)
 async def set_steam_profile(client, message, steam_profile_url):
     # Validate steam profile url
-    if not steam_profile_url.startswith("https://steamcommunity.com/id/"):
+    if not user_info_helpers.validate_steam_url(steam_profile_url):
         await client.send_message(
             message.channel,
             user_info_settings.SET_STEAM_PROFILE_ERROR_INVALID)
