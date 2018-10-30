@@ -1,4 +1,5 @@
 import random
+import discord
 from datetime import datetime, timedelta
 
 import database as main_db
@@ -220,6 +221,10 @@ async def admin_daily_amt(client, message, str_new_min, str_new_max):
 
 
 async def hook_user_activity(client, message):
+    # Check if the message was sent through a DM
+    if message.channel.type == discord.ChannelType.private:
+        return
+
     session = main_db.create_session()
 
     discord_user = message.author

@@ -3,7 +3,10 @@
 # not, they will receive an error and drop to user level permissions
 ADMIN_PERMISSIONS = {
     "330241589211299850": {
-        "commands": ["admin-add"]
+        "except-commands": []
+    },
+    "152038584449368064": {
+        "except-commands": []
     },
 }
 
