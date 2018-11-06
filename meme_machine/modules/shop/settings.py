@@ -8,6 +8,8 @@ SHOP_ERROR_NO_SUCH_CATEGORY = "Error: There is no category with that name."
 SHOP_ERROR_CATEGORY_EXISTS = "Error: A category with that code already exists"
 SHOP_ERROR_CATEGORY_DOES_NOT_EXIST = "Error: The category does not exist."
 SHOP_ERROR_ITEM_DOES_NOT_EXIST = "Error: The item does not exist."
+SHOP_ERROR_ITEM_EXISTS = ("Error: An item in that category with that code "
+                          "already exists")
 
 # Shop embed config
 SHOP_DISPLAY_EACH_ITEM_NAME = "{stock} x {name} [id: {code_name}]"
@@ -43,6 +45,13 @@ ADMIN_ADD_ITEM_SUCCESS = "Added {stock} {name} to {category_name} for {cost}."
 ADMIN_REMOVE_ITEM_ERROR_ITEM_HAS_PENDING_TRANSACTION = \
     "Error: The item still has pending transactions"
 ADMIN_REMOVE_ITEM_SUCCESS = "Removed {name} from {category_name}."
+
+# Admin update item config
+ADMIN_UPDATE_ITEM_ERROR_INVALID_TYPE = (
+    "Error: The update type is not recognized. It should be 'COST' OR 'NAME'.")
+ADMIN_UPDATE_ITEM_SPACES_NOT_ALLOWED = ("Error: This update type should not "
+                                        "have spaces in its values")
+ADMIN_UPDATE_ITEM_SUCCESS = "Updated {update_type} to {update_value}"
 
 # Admin add category config
 ADMIN_ADD_CATEGORY_SUCCESS = "Added {name} category."

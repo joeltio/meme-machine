@@ -280,6 +280,64 @@ async def admin_remove_item(client, message, category_code, item_code):
 
     success_message = shop_settings.ADMIN_REMOVE_ITEM_SUCCESS.format(
         name=item_name, category_name=category_name)
+    await client.send_message(message.channel, success_message)
+
+
+@base_helpers.collate_args(3)
+async def admin_update_item(client, message, category_code, item_code,
+                            update_type, update_value):
+    # Validate arguments
+    # Check that the update type is a valid value
+    error = None
+    if update_type not in ["NAME", "COST"]:
+        error = shop_settings.ADMIN_UPDATE_ITEM_ERROR_INVALID_TYPE
+    elif update_type != "NAME" and " " in update_value:
+        error = shop_settings.ADMIN_UPDATE_ITEM_SPACES_NOT_ALLOWED
+    elif update_type == "COST":
+        error = base_helpers.validate_is_int(update_value, True)
+
+    if error is not None:
+        await client.send_message(message.channel, error)
+        return
+
+    session = main_db.create_session()
+
+    item = shop_models.get_shop_item(session, category_code=category_code,
+                                     item_code=item_code)
+
+    # Check if item exists
+    if item is None:
+        await client.send_message(
+            message.channel,
+            shop_settings.SHOP_ERROR_ITEM_DOES_NOT_EXIST)
+        session.close()
+        return
+
+    # Update the value accordingly
+    if update_type == "NAME":
+        # Derive the equivalent item code
+        new_item_code = shop_models.to_code_name(update_value)
+
+        # Check if an item with that code already exists
+        check_item = shop_models.get_shop_item(
+            session, category_code=category_code, item_code=new_item_code)
+
+        if check_item is not None:
+            error_message = shop_settings.SHOP_ERROR_ITEM_EXISTS
+            await client.send_message(message.channel, error_message)
+            session.close()
+            return
+
+        item.code_name = new_item_code
+        item.name = update_value
+    elif update_type == "COST":
+        item.cost = int(update_value)
+
+    session.commit()
+    session.close()
+
+    success_message = shop_settings.ADMIN_UPDATE_ITEM_SUCCESS.format(
+        update_type=update_type.lower(), update_value=update_value)
 
     await client.send_message(message.channel, success_message)
 
